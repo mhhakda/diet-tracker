@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Tracker Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { color: #2563eb; font-size: 24px; font-weight: bold; }
+        .date { color: #666; margin-top: 5px; }
+        .summary { background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .summary h3 { margin-top: 0; color: #1e40af; }
+        .nutrition-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0; }
+        .nutrition-item { text-align: center; }
+        .nutrition-value { font-size: 24px; font-weight: bold; color: #059669; }
+        .nutrition-label { font-size: 12px; color: #666; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background-color: #f3f4f6; font-weight: bold; color: #374151; }
+        tr:hover { background-color: #f9fafb; }
+        .meal-type { background: #3b82f6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+        .footer { text-align: center; margin-top: 40px; color: #9ca3af; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Diet Tracker Report</div>
+        <div>TheDietPlanner.com</div>
+        <div class="date">Generated on August 15, 2025</div>
+    </div>
+
+    <div class="summary">
+        <h3>Daily Summary - August 15, 2025</h3>
+        <div class="nutrition-grid">
+            <div class="nutrition-item">
+                <div class="nutrition-value">1009</div>
+                <div class="nutrition-label">Calories</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">49g</div>
+                <div class="nutrition-label">Protein</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">135g</div>
+                <div class="nutrition-label">Carbs</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">25g</div>
+                <div class="nutrition-label">Fat</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">17g</div>
+                <div class="nutrition-label">Fiber</div>
+            </div>
+            <div class="nutrition-item">
+                <div class="nutrition-value">1000ml</div>
+                <div class="nutrition-label">Water</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Food Entries</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Meal</th>
+                <th>Food</th>
+                <th>Serving</th>
+                <th>Calories</th>
+                <th>Protein (g)</th>
+                <th>Carbs (g)</th>
+                <th>Fat (g)</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td><span class="meal-type">Breakfast</span></td>
+                <td>Roti (1 medium)</td>
+                <td>2 pieces</td>
+                <td>238</td>
+                <td>6</td>
+                <td>36</td>
+                <td>4</td>
+                <td>With ghee</td>
+            </tr>
+    
+            <tr>
+                <td><span class="meal-type">Breakfast</span></td>
+                <td>Dal (1 cup)</td>
+                <td>1 cup</td>
+                <td>200</td>
+                <td>15</td>
+                <td>25</td>
+                <td>1</td>
+                <td></td>
+            </tr>
+    
+            <tr>
+                <td><span class="meal-type">Lunch</span></td>
+                <td>Rice (1 cup cooked)</td>
+                <td>1.5 cups</td>
+                <td>180</td>
+                <td>3</td>
+                <td>45</td>
+                <td>0</td>
+                <td>Basmati rice</td>
+            </tr>
+    
+            <tr>
+                <td><span class="meal-type">Lunch</span></td>
+                <td>Paneer (100g)</td>
+                <td>100g</td>
+                <td>265</td>
+                <td>18</td>
+                <td>1</td>
+                <td>20</td>
+                <td>Paneer curry</td>
+            </tr>
+    
+            <tr>
+                <td><span class="meal-type">Snack</span></td>
+                <td>Banana (1 medium)</td>
+                <td>1 piece</td>
+                <td>80</td>
+                <td>1</td>
+                <td>20</td>
+                <td>0</td>
+                <td></td>
+            </tr>
+    
+            <tr>
+                <td><span class="meal-type">Dinner</span></td>
+                <td>Spinach (1 cup)</td>
+                <td>2 cups</td>
+                <td>46</td>
+                <td>6</td>
+                <td>8</td>
+                <td>0</td>
+                <td>Saag</td>
+            </tr>
+    
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>This report was generated by Diet Tracker - TheDietPlanner.com</p>
+        <p>For best results, consult with a qualified nutritionist or dietitian.</p>
+    </div>
+</body>
+</html>

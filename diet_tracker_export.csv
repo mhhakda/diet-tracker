@@ -1,0 +1,7 @@
+date,meal_time,food_name,serving_size,calories,protein,carbs,fat,fiber,notes,water_intake
+2025-08-15,breakfast,Roti (1 medium),2 pieces,238,6,36,4,4,With ghee,250
+2025-08-15,breakfast,Dal (1 cup),1 cup,200,15,25,1,7,,0
+2025-08-15,lunch,Rice (1 cup cooked),1.5 cups,180,3,45,0,0,Basmati rice,300
+2025-08-15,lunch,Paneer (100g),100g,265,18,1,20,0,Paneer curry,0
+2025-08-15,snack,Banana (1 medium),1 piece,80,1,20,0,2,,200
+2025-08-15,dinner,Spinach (1 cup),2 cups,46,6,8,0,4,Saag,250
