@@ -380,7 +380,7 @@ class DietTracker {
             'exportPDF': () => this.exportPDF(),
             'getSheetsTemplate': () => this.downloadSheetsTemplate(),
             'importCSV': () => this.triggerCSVImport(),
-            'backupJSON': () => this.exportBackupJSON(),
+            'backupJSON': () => this.noop(),
             'restoreJSON': () => this.triggerJSONRestore(),
             'clearData': () => this.clearAllData()
         };
@@ -1271,9 +1271,110 @@ class DietTracker {
         this.showStatus('Excel export coming soon! Use CSV for now.', 'warning');
     }
 
+    
     async exportPDF() {
-        this.showStatus('PDF export coming soon! Use CSV for now.', 'warning');
+        try {
+            this.showStatus('Preparing PDF report...', 'info');
+            // Create a hidden report container
+            const report = document.createElement('div');
+            report.id = 'pdfReportContainer';
+            report.style.padding = '20px';
+            report.style.fontFamily = 'Arial, sans-serif';
+            report.innerHTML = `
+                <div style="text-align:center; margin-bottom:10px;">
+                    <h1>Diet Tracker Report</h1>
+                    <div>${new Date().toLocaleString()}</div>
+                </div>
+                <div id="reportSummary" style="margin-top:15px;">
+                    <h2>Summary</h2>
+                    <div id="summaryContent"></div>
+                </div>
+                <div id="reportCharts" style="margin-top:15px;">
+                    <h2>Charts</h2>
+                    <div id="chartsWrapper" style="display:flex; flex-direction:column; gap:12px;"></div>
+                </div>
+                <div id="reportEntries" style="margin-top:15px;">
+                    <h2>Entries</h2>
+                    <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse; width:100%; font-size:12px;">
+                        <thead>
+                            <tr>
+                                <th>Date</th><th>Meal</th><th>Food</th><th>Serving</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Fiber</th><th>Water(ml)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entriesBody"></tbody>
+                    </table>
+                </div>
+            `;
+
+            document.body.appendChild(report);
+
+            // Populate summary
+            const totals = (function(entries){ const t={calories:0,protein:0,carbs:0,fat:0,fiber:0,water:0}; if(!Array.isArray(entries)) return t; entries.forEach(e=>{ t.calories+=Number(e.calories)||0; t.protein+=Number(e.protein)||0; t.carbs+=Number(e.carbs)||0; t.fat+=Number(e.fat)||0; t.fiber+=Number(e.fiber)||0; t.water+=Number(e.water_intake)||0; }); for(let k in t) t[k]=Math.round(t[k]*100)/100; return t;})(this.entries); // { calories, protein, carbs, fat, fiber, water }
+            const summaryContent = report.querySelector('#summaryContent');
+            summaryContent.innerHTML = `
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <div style="min-width:120px;"><strong>Calories:</strong><div>${totals.calories}</div></div>
+                    <div style="min-width:120px;"><strong>Protein:</strong><div>${totals.protein} g</div></div>
+                    <div style="min-width:120px;"><strong>Carbs:</strong><div>${totals.carbs} g</div></div>
+                    <div style="min-width:120px;"><strong>Fat:</strong><div>${totals.fat} g</div></div>
+                    <div style="min-width:120px;"><strong>Fiber:</strong><div>${totals.fiber} g</div></div>
+                    <div style="min-width:120px;"><strong>Water:</strong><div>${totals.water} ml</div></div>
+                </div>
+            `;
+
+            // Add chart images (capture canvases if available)
+            const chartIds = ['caloriesChart', 'macrosChart', 'weeklyChart'];
+            const chartsWrapper = report.querySelector('#chartsWrapper');
+            chartIds.forEach(id => {
+                const c = document.getElementById(id);
+                if (c && c.toDataURL) {
+                    const img = new Image();
+                    img.src = c.toDataURL('image/png');
+                    img.style.maxWidth = '100%';
+                    chartsWrapper.appendChild(img);
+                }
+            });
+
+            // Populate entries table
+            const tbody = report.querySelector('#entriesBody');
+            const rows = this.entries || [];
+            rows.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r.date || ''}</td>
+                    <td>${r.meal_time || ''}</td>
+                    <td>${r.food_name || ''}</td>
+                    <td>${r.serving_size || ''}</td>
+                    <td>${r.calories || ''}</td>
+                    <td>${r.protein || ''}</td>
+                    <td>${r.carbs || ''}</td>
+                    <td>${r.fat || ''}</td>
+                    <td>${r.fiber || ''}</td>
+                    <td>${r.water_intake || ''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Use html2pdf to export
+            const opt = {
+                margin: 0.4,
+                filename: 'diet_tracker_report.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().set(opt).from(report).save();
+
+            // Cleanup
+            document.body.removeChild(report);
+            this.showStatus('PDF report ready.', 'success');
+        } catch (err) {
+            console.error('PDF export error', err);
+            this.showStatus('Failed to generate PDF. Try again.', 'error');
+        }
     }
+
 
     downloadSheetsTemplate() {
         const templateData = [
@@ -1298,7 +1399,7 @@ class DietTracker {
         event.target.value = '';
     }
 
-    exportBackupJSON() {
+    noop() {
         const backupData = {
             version: '1.0.0',
             timestamp: new Date().toISOString(),
@@ -1512,10 +1613,29 @@ All data is stored locally for privacy!`);
         ];
         
         this.saveData();
-    }
+    }    // Calculate totals across current entries
+    calculateTotals() {
+        const totals = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, water: 0 };
+        if (!Array.isArray(this.entries)) return totals;
+        this.entries.forEach(e => {
+            totals.calories += Number(e.calories) || 0;
+            totals.protein += Number(e.protein) || 0;
+            totals.carbs += Number(e.carbs) || 0;
+            totals.fat += Number(e.fat) || 0;
+            totals.fiber += Number(e.fiber) || 0;
+            totals.water += Number(e.water_intake) || 0;
+        }
 }
 
 // Initialize the app
+
+
+);
+        // Round totals
+        for (let k in totals) totals[k] = Math.round(totals[k]*100)/100;
+        return totals;
+    }
+
 console.log('🚀 Diet Tracker script loaded');
 const dietTracker = new DietTracker();
 window.dietTracker = dietTracker;

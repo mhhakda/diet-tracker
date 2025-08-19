@@ -257,71 +257,16 @@
                                 <h4>Quick Exports</h4>
                                 <div class="export-buttons">
                                     <button class="btn btn--primary export-btn" id="exportCSV">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                        </svg>
-                                        CSV File
-                                    </button>
-                                    <button class="btn btn--primary export-btn" id="exportXLSX">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                        </svg>
-                                        Excel File
+                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M14,2H6A2,2...,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                                        Download Excel (CSV)
                                     </button>
                                     <button class="btn btn--primary export-btn" id="exportPDF">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                        </svg>
-                                        PDF Report
+                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M14,2H6A2,2...,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                                        Download PDF Report
                                     </button>
                                 </div>
                             </div>
 
-                            <div class="export-group">
-                                <h4>Data Management</h4>
-                                <div class="export-buttons">
-                                    <button class="btn btn--secondary" id="backupJSON">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19Z"/>
-                                        </svg>
-                                        Backup JSON
-                                    </button>
-                                    <button class="btn btn--secondary" id="restoreJSON">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12,3A9,9 0 0,1 21,12H18A6,6 0 0,0 12,6V3M12,21A9,9 0 0,1 3,12H6A6,6 0 0,0 12,18V21M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M15.5,12L10.5,16L15.5,12L10.5,8L15.5,12Z"/>
-                                        </svg>
-                                        Restore JSON
-                                    </button>
-                                    <button class="btn btn--outline" id="importCSV">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                        </svg>
-                                        Import CSV
-                                    </button>
-                                    <button class="btn btn--outline" id="clearData" style="color: var(--color-error);">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z"/>
-                                        </svg>
-                                        Clear All Data
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="export-group">
-                                <h4>Google Sheets Template</h4>
-                                <p>Download a pre-formatted Excel template that you can upload to Google Sheets:</p>
-                                <button class="btn btn--outline" id="getSheetsTemplate">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M19,3H5C3.9,3 3,3.9 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M19,19H5V5H19V19M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29Z"/>
-                                    </svg>
-                                    Download Template
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="export-status" id="exportStatus" role="status" aria-live="polite"></div>
-                    </div>
-                </div>
             </div>
         </main>
 
@@ -465,12 +410,12 @@
 
         <!-- Hidden file inputs for imports -->
         <input type="file" id="csvFileInput" accept=".csv" style="display: none;" aria-label="Select CSV file to import">
-        <input type="file" id="jsonFileInput" accept=".json" style="display: none;" aria-label="Select JSON file to restore">
-    </div>
+        </div>
 
     <!-- Status announcement for screen readers -->
     <div id="statusAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
