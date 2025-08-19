@@ -18,12 +18,6 @@
                         <span class="subtitle">by TheDietPlanner.com</span>
                     </div>
                     <div class="header-actions">
-                        <button class="btn btn--outline btn--sm" id="backupBtn" aria-label="Backup data">
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                            </svg>
-                            Backup
-                        </button>
                         <button class="btn btn--outline btn--sm" id="profileBtn" aria-label="Open profile settings">
                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -32,7 +26,7 @@
                         </button>
                         <button class="btn btn--outline btn--sm" id="themeToggle" aria-label="Toggle theme">
                             <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" id="themeIcon">
-                                <path d="M7.5,2C5.71,3.15 4.5,5.18 4.5,7.5C4.5,9.82 5.71,11.85 7.53,13C4.46,13 2,10.54 2,7.5A5.5,5.5 0 0,1 7.5,2M19.07,3.5L20.5,4.93L4.93,20.5L3.5,19.07L19.07,3.5M12.89,5.93L11.41,5L9.97,6L10.39,4.3L9,3.24L10.75,3.12L11.33,1.47L12,3.1L13.73,3.13L12.38,4.26L12.89,5.93M9.59,9.54L8.43,8.81L7.31,9.59L7.65,8.27L6.56,7.44L7.92,7.35L8.37,6.06L8.88,7.33L10.24,7.36L9.19,8.23L9.59,9.54M19,13.5A5.5,5.5 0 0,1 13.5,19C12.28,19 11.15,18.6 10.24,17.93L17.93,10.24C18.6,11.15 19,12.28 19,13.5Z"/>
+                                <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
                             </svg>
                         </button>
                     </div>
@@ -41,30 +35,30 @@
         </header>
 
         <!-- Navigation Tabs -->
-        <nav class="nav-tabs" role="tablist">
+        <nav class="nav-tabs">
             <div class="container">
-                <div class="tab-list">
-                    <button class="tab-button active" role="tab" aria-selected="true" aria-controls="dailyTab" data-tab="daily">
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                <div class="tab-list" role="tablist">
+                    <button class="tab-button active" data-tab="daily" role="tab" aria-selected="true" aria-controls="dailyTab">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
                         </svg>
-                        Daily View
+                        Daily
                     </button>
-                    <button class="tab-button" role="tab" aria-selected="false" aria-controls="weeklyTab" data-tab="weekly">
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h18v8z"/>
+                    <button class="tab-button" data-tab="weekly" role="tab" aria-selected="false" aria-controls="weeklyTab">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
                         </svg>
-                        Weekly View
+                        Weekly
                     </button>
-                    <button class="tab-button" role="tab" aria-selected="false" aria-controls="analyticsTab" data-tab="analytics">
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M22 21H2v-2h20v2zm-9-4v-2H9c-1.1 0-2 .9-2 2v2h6zm4 0v-6h-4c-1.1 0-2 .9-2 2v6h6zm4 0V9h-4c-1.1 0-2 .9-2 2v8h6z"/>
+                    <button class="tab-button" data-tab="analytics" role="tab" aria-selected="false" aria-controls="analyticsTab">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
                         </svg>
                         Analytics
                     </button>
-                    <button class="tab-button" role="tab" aria-selected="false" aria-controls="exportTab" data-tab="export">
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    <button class="tab-button" data-tab="export" role="tab" aria-selected="false" aria-controls="exportTab">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/>
                         </svg>
                         Export
                     </button>
@@ -75,33 +69,32 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="container">
-                <!-- Daily View Tab -->
-                <div class="tab-content active" id="dailyTab" role="tabpanel" aria-labelledby="daily-tab">
+                <!-- Daily Tab -->
+                <div id="dailyTab" class="tab-content active">
                     <div class="daily-header">
                         <div class="date-selector">
-                            <button id="prevDay" class="date-nav-btn" aria-label="Previous day">‹</button>
-                            <label for="currentDate" class="sr-only">Select date</label>
-                            <input type="date" id="currentDate" class="form-control date-input" aria-label="Current date">
-                            <button id="nextDay" class="date-nav-btn" aria-label="Next day">›</button>
+                            <button class="date-nav-btn" id="prevDay" aria-label="Previous day">‹</button>
+                            <input type="date" class="form-control date-input" id="currentDate" aria-label="Select date">
+                            <button class="date-nav-btn" id="nextDay" aria-label="Next day">›</button>
                         </div>
                         <button class="btn btn--primary" id="addEntryBtn" aria-label="Add new food entry">
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                             </svg>
                             Add Food
                         </button>
                     </div>
 
-                    <!-- Daily Summary Cards -->
+                    <!-- Summary Cards -->
                     <div class="summary-grid">
                         <div class="summary-card">
                             <h3>Calories</h3>
                             <div class="summary-value">
-                                <span class="current" id="caloriesCurrent" aria-label="Current calories">0</span>
+                                <span class="current" id="caloriesCurrent">0</span>
                                 <span class="target">/ <span id="caloriesTarget">2000</span></span>
                             </div>
-                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-fill" id="caloriesProgress"></div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="caloriesProgress" style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -111,8 +104,8 @@
                                 <span class="current" id="proteinCurrent">0</span>g
                                 <span class="target">/ <span id="proteinTarget">150</span>g</span>
                             </div>
-                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-fill" id="proteinProgress"></div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="proteinProgress" style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -122,8 +115,8 @@
                                 <span class="current" id="carbsCurrent">0</span>g
                                 <span class="target">/ <span id="carbsTarget">250</span>g</span>
                             </div>
-                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-fill" id="carbsProgress"></div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="carbsProgress" style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -133,8 +126,8 @@
                                 <span class="current" id="fatCurrent">0</span>g
                                 <span class="target">/ <span id="fatTarget">65</span>g</span>
                             </div>
-                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-fill" id="fatProgress"></div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="fatProgress" style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -144,8 +137,8 @@
                                 <span class="current" id="fiberCurrent">0</span>g
                                 <span class="target">/ <span id="fiberTarget">25</span>g</span>
                             </div>
-                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-fill" id="fiberProgress"></div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="fiberProgress" style="width: 0%"></div>
                             </div>
                         </div>
 
@@ -156,178 +149,136 @@
                                 <span class="target">/ <span id="waterTarget">2000</span>ml</span>
                             </div>
                             <div class="water-buttons">
-                                <button class="water-btn" data-amount="250" aria-label="Add 250ml water">+250ml</button>
-                                <button class="water-btn" data-amount="500" aria-label="Add 500ml water">+500ml</button>
+                                <button class="water-btn" data-amount="250">250ml</button>
+                                <button class="water-btn" data-amount="500">500ml</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Meal Sections -->
+                    <!-- Meals -->
                     <div class="meals-container">
-                        <div class="meal-section" data-meal="breakfast">
+                        <section class="meal-section" data-meal="breakfast">
                             <h3 class="meal-title">
-                                <span>🌅 Breakfast</span>
+                                🌅 Breakfast
                                 <span class="meal-calories">0 kcal</span>
                             </h3>
-                            <div class="meal-entries" role="list"></div>
-                        </div>
+                            <div class="meal-entries"></div>
+                        </section>
 
-                        <div class="meal-section" data-meal="mid-morning">
+                        <section class="meal-section" data-meal="mid-morning">
                             <h3 class="meal-title">
-                                <span>☕ Mid-Morning</span>
+                                ☕ Mid-Morning
                                 <span class="meal-calories">0 kcal</span>
                             </h3>
-                            <div class="meal-entries" role="list"></div>
-                        </div>
+                            <div class="meal-entries"></div>
+                        </section>
 
-                        <div class="meal-section" data-meal="lunch">
+                        <section class="meal-section" data-meal="lunch">
                             <h3 class="meal-title">
-                                <span>🍽️ Lunch</span>
+                                🍽️ Lunch
                                 <span class="meal-calories">0 kcal</span>
                             </h3>
-                            <div class="meal-entries" role="list"></div>
-                        </div>
+                            <div class="meal-entries"></div>
+                        </section>
 
-                        <div class="meal-section" data-meal="snack">
+                        <section class="meal-section" data-meal="snack">
                             <h3 class="meal-title">
-                                <span>🍎 Snack</span>
+                                🍎 Snack
                                 <span class="meal-calories">0 kcal</span>
                             </h3>
-                            <div class="meal-entries" role="list"></div>
-                        </div>
+                            <div class="meal-entries"></div>
+                        </section>
 
-                        <div class="meal-section" data-meal="dinner">
+                        <section class="meal-section" data-meal="dinner">
                             <h3 class="meal-title">
-                                <span>🌙 Dinner</span>
+                                🌙 Dinner
                                 <span class="meal-calories">0 kcal</span>
                             </h3>
-                            <div class="meal-entries" role="list"></div>
-                        </div>
+                            <div class="meal-entries"></div>
+                        </section>
                     </div>
                 </div>
 
-                <!-- Weekly View Tab -->
-                <div class="tab-content" id="weeklyTab" role="tabpanel" aria-labelledby="weekly-tab">
+                <!-- Weekly Tab -->
+                <div id="weeklyTab" class="tab-content">
                     <div class="weekly-header">
                         <div class="week-selector">
-                            <button id="prevWeek" class="date-nav-btn" aria-label="Previous week">‹</button>
-                            <span id="weekRange" role="status">Week of Aug 12 - Aug 18, 2025</span>
-                            <button id="nextWeek" class="date-nav-btn" aria-label="Next week">›</button>
+                            <button class="date-nav-btn" id="prevWeek" aria-label="Previous week">‹</button>
+                            <span id="weekRange">Week of Aug 12 - Aug 18, 2025</span>
+                            <button class="date-nav-btn" id="nextWeek" aria-label="Next week">›</button>
                         </div>
                     </div>
-                    <div class="weekly-grid" id="weeklyGrid" role="grid">
-                        <!-- Weekly grid will be populated by JavaScript -->
+
+                    <div class="weekly-grid">
+                        <!-- Week cards will be dynamically generated -->
                     </div>
                 </div>
 
                 <!-- Analytics Tab -->
-                <div class="tab-content" id="analyticsTab" role="tabpanel" aria-labelledby="analytics-tab">
+                <div id="analyticsTab" class="tab-content">
                     <div class="charts-container">
                         <div class="chart-section">
                             <h3>Calories Over Time (Last 7 Days)</h3>
-                            <div class="chart-container" style="position: relative; height: 300px;">
-                                <canvas id="caloriesChart" role="img" aria-label="Calories over time chart"></canvas>
+                            <div class="chart-container">
+                                <canvas id="caloriesChart" width="400" height="200"></canvas>
                             </div>
                         </div>
 
                         <div class="chart-section">
                             <h3>Macro Distribution (Today)</h3>
-                            <div class="chart-container" style="position: relative; height: 300px;">
-                                <canvas id="macrosChart" role="img" aria-label="Macro distribution chart"></canvas>
+                            <div class="chart-container">
+                                <canvas id="macrosChart" width="400" height="200"></canvas>
                             </div>
                         </div>
 
                         <div class="chart-section">
                             <h3>Weekly Summary</h3>
-                            <div class="chart-container" style="position: relative; height: 300px;">
-                                <canvas id="weeklyChart" role="img" aria-label="Weekly summary chart"></canvas>
+                            <div class="chart-container">
+                                <canvas id="weeklyChart" width="400" height="200"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Export Tab -->
-                <div class="tab-content" id="exportTab" role="tabpanel" aria-labelledby="export-tab">
+                <!-- Export Tab - Simplified -->
+                <div id="exportTab" class="tab-content">
                     <div class="export-section">
-                        <h3>Export & Backup</h3>
-                        <p class="export-description">Export your data, create backups, or get templates for external tools. <br><strong>All data stays local</strong> - no external servers involved.</p>
-                        
+                        <div class="export-description">
+                            <h2>Export & Download</h2>
+                            <p>Export your nutrition data for external analysis or backup purposes.</p>
+                            <p><strong>All data stays local</strong> - no external servers involved.</p>
+                        </div>
+
                         <div class="export-options">
                             <div class="export-group">
-                                <h4>Quick Exports</h4>
+                                <h4>📊 Data Export</h4>
+                                <p>Download your food entries and nutrition data in different formats.</p>
                                 <div class="export-buttons">
                                     <button class="btn btn--primary export-btn" id="exportCSV">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
                                         </svg>
-                                        CSV File
+                                        Download Excel (CSV)
                                     </button>
-                                    <button class="btn btn--primary export-btn" id="exportXLSX">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                    <button class="btn btn--secondary export-btn" id="exportPDF">
+                                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zm-5.5-6.5L9 17h2l.5-1.5H13L13.5 17h2l-2.5-3.5zm-.25-1.5h.5L13 13h-1.5l.25 1z"/>
                                         </svg>
-                                        Excel File
-                                    </button>
-                                    <button class="btn btn--primary export-btn" id="exportPDF">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                        </svg>
-                                        PDF Report
+                                        Download PDF Report
                                     </button>
                                 </div>
-                            </div>
-
-                            <div class="export-group">
-                                <h4>Data Management</h4>
-                                <div class="export-buttons">
-                                    <button class="btn btn--secondary" id="backupJSON">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M9,10H7V12H9V10M13,10H11V12H13V10M17,10H15V12H17V10M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19Z"/>
-                                        </svg>
-                                        Backup JSON
-                                    </button>
-                                    <button class="btn btn--secondary" id="restoreJSON">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12,3A9,9 0 0,1 21,12H18A6,6 0 0,0 12,6V3M12,21A9,9 0 0,1 3,12H6A6,6 0 0,0 12,18V21M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M15.5,12L10.5,16L15.5,12L10.5,8L15.5,12Z"/>
-                                        </svg>
-                                        Restore JSON
-                                    </button>
-                                    <button class="btn btn--outline" id="importCSV">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                        </svg>
-                                        Import CSV
-                                    </button>
-                                    <button class="btn btn--outline" id="clearData" style="color: var(--color-error);">
-                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z"/>
-                                        </svg>
-                                        Clear All Data
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="export-group">
-                                <h4>Google Sheets Template</h4>
-                                <p>Download a pre-formatted Excel template that you can upload to Google Sheets:</p>
-                                <button class="btn btn--outline" id="getSheetsTemplate">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M19,3H5C3.9,3 3,3.9 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M19,19H5V5H19V19M13.96,12.29L11.21,15.83L9.25,13.47L6.5,17H17.5L13.96,12.29Z"/>
-                                    </svg>
-                                    Download Template
-                                </button>
                             </div>
                         </div>
 
-                        <div class="export-status" id="exportStatus" role="status" aria-live="polite"></div>
+                        <div id="exportStatus" class="export-status"></div>
                     </div>
                 </div>
             </div>
         </main>
 
         <!-- Add Entry Modal -->
-        <div class="modal hidden" id="addEntryModal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
-            <div class="modal-backdrop" aria-label="Close modal"></div>
+        <div id="addEntryModal" class="modal hidden" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+            <div class="modal-backdrop"></div>
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 id="modalTitle">Add Food Entry</h2>
@@ -335,70 +286,76 @@
                 </div>
                 <div class="modal-body">
                     <form id="entryForm">
+                        <div class="form-description">
+                            <p>Track your food intake with detailed nutrition information. Use the preset foods or add custom entries.</p>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="entryDate" class="form-label">Date</label>
-                                <input type="date" id="entryDate" class="form-control" required>
+                                <label class="form-label" for="entryDate">Date *</label>
+                                <input type="date" class="form-control" id="entryDate" required>
                             </div>
                             <div class="form-group">
-                                <label for="entryMealTime" class="form-label">Meal</label>
-                                <select id="entryMealTime" class="form-control" required>
-                                    <option value="breakfast">🌅 Breakfast</option>
-                                    <option value="mid-morning">☕ Mid-Morning</option>
-                                    <option value="lunch">🍽️ Lunch</option>
-                                    <option value="snack">🍎 Snack</option>
-                                    <option value="dinner">🌙 Dinner</option>
+                                <label class="form-label" for="entryMealTime">Meal Time *</label>
+                                <select class="form-control" id="entryMealTime" required>
+                                    <option value="">Select meal time</option>
+                                    <option value="breakfast">Breakfast</option>
+                                    <option value="mid-morning">Mid-Morning</option>
+                                    <option value="lunch">Lunch</option>
+                                    <option value="snack">Snack</option>
+                                    <option value="dinner">Dinner</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="presetFoods" class="form-label">Quick Select (Indian Foods)</label>
-                            <select id="presetFoods" class="form-control preset-select">
-                                <option value="">Choose from Indian foods database...</option>
+                            <label class="form-label" for="presetFoods">Choose from Indian Foods Database</label>
+                            <select class="form-control preset-select" id="presetFoods">
+                                <option value="">Select a preset food...</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="entryFood" class="form-label">Food Name</label>
-                            <input type="text" id="entryFood" class="form-control" placeholder="Enter food name" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="entryServing" class="form-label">Serving Size</label>
-                            <input type="text" id="entryServing" class="form-control" placeholder="e.g., 1 cup, 100g, 2 pieces" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="entryFood">Food Name *</label>
+                                <input type="text" class="form-control" id="entryFood" placeholder="Enter food name or select preset" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="entryServing">Serving Size *</label>
+                                <input type="text" class="form-control" id="entryServing" placeholder="e.g., 1 cup, 100g" required>
+                            </div>
                         </div>
 
                         <div class="nutrition-grid">
                             <div class="form-group">
-                                <label for="entryCalories" class="form-label">Calories</label>
-                                <input type="number" id="entryCalories" class="form-control" placeholder="0" min="0" step="0.1" required>
+                                <label class="form-label" for="entryCalories">Calories</label>
+                                <input type="number" class="form-control" id="entryCalories" min="0" step="0.1" placeholder="0">
                             </div>
                             <div class="form-group">
-                                <label for="entryProtein" class="form-label">Protein (g)</label>
-                                <input type="number" id="entryProtein" class="form-control" placeholder="0" min="0" step="0.1" required>
+                                <label class="form-label" for="entryProtein">Protein (g)</label>
+                                <input type="number" class="form-control" id="entryProtein" min="0" step="0.1" placeholder="0">
                             </div>
                             <div class="form-group">
-                                <label for="entryCarbs" class="form-label">Carbs (g)</label>
-                                <input type="number" id="entryCarbs" class="form-control" placeholder="0" min="0" step="0.1" required>
+                                <label class="form-label" for="entryCarbs">Carbs (g)</label>
+                                <input type="number" class="form-control" id="entryCarbs" min="0" step="0.1" placeholder="0">
                             </div>
                             <div class="form-group">
-                                <label for="entryFat" class="form-label">Fat (g)</label>
-                                <input type="number" id="entryFat" class="form-control" placeholder="0" min="0" step="0.1" required>
+                                <label class="form-label" for="entryFat">Fat (g)</label>
+                                <input type="number" class="form-control" id="entryFat" min="0" step="0.1" placeholder="0">
                             </div>
                             <div class="form-group">
-                                <label for="entryFiber" class="form-label">Fiber (g)</label>
-                                <input type="number" id="entryFiber" class="form-control" placeholder="0" min="0" step="0.1">
+                                <label class="form-label" for="entryFiber">Fiber (g)</label>
+                                <input type="number" class="form-control" id="entryFiber" min="0" step="0.1" placeholder="0">
                             </div>
                             <div class="form-group">
-                                <label for="entryWater" class="form-label">Water (ml)</label>
-                                <input type="number" id="entryWater" class="form-control" placeholder="0" min="0">
+                                <label class="form-label" for="entryWater">Water (ml)</label>
+                                <input type="number" class="form-control" id="entryWater" min="0" step="1" placeholder="0">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="entryNotes" class="form-label">Notes (optional)</label>
-                            <textarea id="entryNotes" class="form-control" placeholder="Add any notes about preparation, taste, or other details..." rows="2"></textarea>
+                            <label class="form-label" for="entryNotes">Notes (Optional)</label>
+                            <textarea class="form-control" id="entryNotes" rows="3" placeholder="Additional notes about preparation, ingredients, etc."></textarea>
                         </div>
                     </form>
                 </div>
@@ -410,67 +367,59 @@
         </div>
 
         <!-- Profile Modal -->
-        <div class="modal hidden" id="profileModal" role="dialog" aria-labelledby="profileModalTitle" aria-modal="true">
-            <div class="modal-backdrop" aria-label="Close modal"></div>
+        <div id="profileModal" class="modal hidden" role="dialog" aria-labelledby="profileModalTitle" aria-modal="true">
+            <div class="modal-backdrop"></div>
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 id="profileModalTitle">Profile & Targets</h2>
+                    <h2 id="profileModalTitle">Profile Settings</h2>
                     <button class="modal-close" aria-label="Close modal">×</button>
                 </div>
                 <div class="modal-body">
                     <form id="profileForm">
-                        <h3>Daily Nutrition Targets</h3>
-                        <p class="form-description">Set your daily nutrition goals. These will be used to track your progress.</p>
-                        
+                        <div class="form-description">
+                            <p>Set your daily nutrition targets to track your progress towards your health goals.</p>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="targetCalories" class="form-label">Calories</label>
-                                <input type="number" id="targetCalories" class="form-control" placeholder="2000" min="500" max="5000">
+                                <label class="form-label" for="targetCalories">Daily Calories Target</label>
+                                <input type="number" class="form-control" id="targetCalories" min="500" max="5000" step="50" placeholder="2000">
                             </div>
                             <div class="form-group">
-                                <label for="targetWater" class="form-label">Water (ml)</label>
-                                <input type="number" id="targetWater" class="form-control" placeholder="2000" min="500" max="5000">
+                                <label class="form-label" for="targetWater">Daily Water Target (ml)</label>
+                                <input type="number" class="form-control" id="targetWater" min="500" max="5000" step="250" placeholder="2000">
                             </div>
                         </div>
-                        
-                        <div class="form-row">
+
+                        <div class="nutrition-grid">
                             <div class="form-group">
-                                <label for="targetProtein" class="form-label">Protein (g)</label>
-                                <input type="number" id="targetProtein" class="form-control" placeholder="150" min="10" max="500">
+                                <label class="form-label" for="targetProtein">Protein (g)</label>
+                                <input type="number" class="form-control" id="targetProtein" min="10" max="300" step="5" placeholder="150">
                             </div>
                             <div class="form-group">
-                                <label for="targetCarbs" class="form-label">Carbs (g)</label>
-                                <input type="number" id="targetCarbs" class="form-control" placeholder="250" min="20" max="800">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="targetFat" class="form-label">Fat (g)</label>
-                                <input type="number" id="targetFat" class="form-control" placeholder="65" min="10" max="200">
+                                <label class="form-label" for="targetCarbs">Carbs (g)</label>
+                                <input type="number" class="form-control" id="targetCarbs" min="20" max="500" step="10" placeholder="250">
                             </div>
                             <div class="form-group">
-                                <label for="targetFiber" class="form-label">Fiber (g)</label>
-                                <input type="number" id="targetFiber" class="form-control" placeholder="25" min="5" max="100">
+                                <label class="form-label" for="targetFat">Fat (g)</label>
+                                <input type="number" class="form-control" id="targetFat" min="10" max="200" step="5" placeholder="65">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="targetFiber">Fiber (g)</label>
+                                <input type="number" class="form-control" id="targetFiber" min="5" max="100" step="5" placeholder="25">
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn--outline" id="cancelProfile">Cancel</button>
-                    <button type="submit" form="profileForm" class="btn btn--primary" id="saveProfile">Save Settings</button>
+                    <button type="submit" form="profileForm" class="btn btn--primary">Save Profile</button>
                 </div>
             </div>
         </div>
-
-        <!-- Hidden file inputs for imports -->
-        <input type="file" id="csvFileInput" accept=".csv" style="display: none;" aria-label="Select CSV file to import">
-        <input type="file" id="jsonFileInput" accept=".json" style="display: none;" aria-label="Select JSON file to restore">
     </div>
 
-    <!-- Status announcement for screen readers -->
-    <div id="statusAnnouncement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-
+    <!-- App Script -->
     <script src="app.js"></script>
 </body>
 </html>

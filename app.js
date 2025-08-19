@@ -3,9 +3,17 @@
  * A comprehensive nutrition tracking app with Indian foods database
  * Features: Entry management, export functionality, charts, offline storage
  * 
- * @version 1.0.0
+ * @version 1.1.0
  * @author TheDietPlanner.com
  */
+
+// Global helper function for safe numeric parsing
+function safeNumber(v) {
+    if (v == null || v == undefined) return 0;
+    if (typeof v === 'number') return isNaN(v) ? 0 : v;
+    const n = parseFloat(String(v).replace(/,/g, ''));
+    return isNaN(n) ? 0 : n;
+}
 
 class DietTracker {
     constructor() {
@@ -25,9 +33,8 @@ class DietTracker {
         this.charts = {};
         this.currentEditingEntry = null;
         this.chartsLoaded = false;
-        this.xlsxLoaded = false;
         this.pdfLoaded = false;
-        
+
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
@@ -47,20 +54,20 @@ class DietTracker {
         {"name": "Poha (1 cup)", "calories": 180, "protein": 6, "carbs": 35, "fat": 2, "fiber": 2, "category": "grains", "serving": "1 cup"},
         {"name": "Paratha (1 medium)", "calories": 280, "protein": 6, "carbs": 36, "fat": 12, "fiber": 3, "category": "grains", "serving": "1 piece"},
         {"name": "Chapati (1 medium)", "calories": 104, "protein": 3, "carbs": 18, "fat": 2, "fiber": 2, "category": "grains", "serving": "1 piece"},
-        
+
         // Legumes & Pulses
         {"name": "Dal (1 cup)", "calories": 200, "protein": 15, "carbs": 25, "fat": 1, "fiber": 7, "category": "legumes", "serving": "1 cup"},
         {"name": "Rajma (1 cup)", "calories": 245, "protein": 15, "carbs": 45, "fat": 1, "fiber": 11, "category": "legumes", "serving": "1 cup"},
         {"name": "Chana (1 cup)", "calories": 210, "protein": 12, "carbs": 35, "fat": 3, "fiber": 10, "category": "legumes", "serving": "1 cup"},
         {"name": "Moong Dal (1 cup)", "calories": 190, "protein": 14, "carbs": 32, "fat": 1, "fiber": 8, "category": "legumes", "serving": "1 cup"},
-        
+
         // Dairy Products
         {"name": "Milk (1 cup)", "calories": 65, "protein": 3, "carbs": 5, "fat": 4, "fiber": 0, "category": "dairy", "serving": "1 cup"},
         {"name": "Paneer (100g)", "calories": 265, "protein": 18, "carbs": 1, "fat": 20, "fiber": 0, "category": "dairy", "serving": "100g"},
         {"name": "Curd (1 cup)", "calories": 98, "protein": 11, "carbs": 12, "fat": 0, "fiber": 0, "category": "dairy", "serving": "1 cup"},
         {"name": "Buttermilk (1 cup)", "calories": 19, "protein": 2, "carbs": 3, "fat": 0, "fiber": 0, "category": "dairy", "serving": "1 cup"},
         {"name": "Lassi (1 cup)", "calories": 180, "protein": 6, "carbs": 20, "fat": 8, "fiber": 0, "category": "dairy", "serving": "1 cup"},
-        
+
         // Fruits
         {"name": "Banana (1 medium)", "calories": 80, "protein": 1, "carbs": 20, "fat": 0, "fiber": 2, "category": "fruits", "serving": "1 piece"},
         {"name": "Apple (1 medium)", "calories": 52, "protein": 0, "carbs": 14, "fat": 0, "fiber": 2, "category": "fruits", "serving": "1 piece"},
@@ -68,7 +75,7 @@ class DietTracker {
         {"name": "Orange (1 medium)", "calories": 47, "protein": 1, "carbs": 12, "fat": 0, "fiber": 2, "category": "fruits", "serving": "1 piece"},
         {"name": "Grapes (1 cup)", "calories": 60, "protein": 1, "carbs": 15, "fat": 0, "fiber": 1, "category": "fruits", "serving": "1 cup"},
         {"name": "Papaya (1 cup)", "calories": 55, "protein": 1, "carbs": 14, "fat": 0, "fiber": 3, "category": "fruits", "serving": "1 cup"},
-        
+
         // Vegetables
         {"name": "Potato (1 medium)", "calories": 80, "protein": 1, "carbs": 22, "fat": 0, "fiber": 2, "category": "vegetables", "serving": "1 piece"},
         {"name": "Tomato (1 medium)", "calories": 15, "protein": 1, "carbs": 3, "fat": 0, "fiber": 1, "category": "vegetables", "serving": "1 piece"},
@@ -80,24 +87,24 @@ class DietTracker {
         {"name": "Cabbage (1 cup)", "calories": 45, "protein": 2, "carbs": 10, "fat": 0, "fiber": 4, "category": "vegetables", "serving": "1 cup"},
         {"name": "Peas (1 cup)", "calories": 93, "protein": 5, "carbs": 8, "fat": 0, "fiber": 4, "category": "vegetables", "serving": "1 cup"},
         {"name": "Okra (1 cup)", "calories": 35, "protein": 2, "carbs": 7, "fat": 0, "fiber": 3, "category": "vegetables", "serving": "1 cup"},
-        
+
         // Protein Sources
         {"name": "Chicken (100g)", "calories": 150, "protein": 25, "carbs": 0, "fat": 5, "fiber": 0, "category": "protein", "serving": "100g"},
         {"name": "Egg (1 large)", "calories": 70, "protein": 6, "carbs": 0, "fat": 5, "fiber": 0, "category": "protein", "serving": "1 piece"},
         {"name": "Fish (100g)", "calories": 220, "protein": 20, "carbs": 8, "fat": 10, "fiber": 0, "category": "protein", "serving": "100g"},
         {"name": "Mutton (100g)", "calories": 194, "protein": 26, "carbs": 0, "fat": 9, "fiber": 0, "category": "protein", "serving": "100g"},
-        
+
         // Fats & Oils
         {"name": "Ghee (1 tbsp)", "calories": 135, "protein": 0, "carbs": 0, "fat": 15, "fiber": 0, "category": "fats", "serving": "1 tbsp"},
         {"name": "Oil (1 tbsp)", "calories": 120, "protein": 0, "carbs": 0, "fat": 14, "fiber": 0, "category": "fats", "serving": "1 tbsp"},
         {"name": "Butter (1 tbsp)", "calories": 102, "protein": 0, "carbs": 0, "fat": 12, "fiber": 0, "category": "fats", "serving": "1 tbsp"},
-        
+
         // Nuts & Seeds
         {"name": "Almonds (10 pieces)", "calories": 69, "protein": 3, "carbs": 3, "fat": 6, "fiber": 1, "category": "nuts", "serving": "10 pieces"},
         {"name": "Peanuts (30g)", "calories": 171, "protein": 7, "carbs": 3, "fat": 15, "fiber": 2, "category": "nuts", "serving": "30g"},
         {"name": "Coconut (30g)", "calories": 106, "protein": 1, "carbs": 4, "fat": 10, "fiber": 3, "category": "nuts", "serving": "30g"},
         {"name": "Walnuts (5 pieces)", "calories": 131, "protein": 3, "carbs": 3, "fat": 13, "fiber": 1, "category": "nuts", "serving": "5 pieces"},
-        
+
         // Beverages & Others
         {"name": "Tea (1 cup)", "calories": 2, "protein": 0, "carbs": 1, "fat": 0, "fiber": 0, "category": "beverages", "serving": "1 cup"},
         {"name": "Coffee (1 cup)", "calories": 2, "protein": 0, "carbs": 0, "fat": 0, "fiber": 0, "category": "beverages", "serving": "1 cup"},
@@ -106,31 +113,32 @@ class DietTracker {
         {"name": "Honey (1 tbsp)", "calories": 64, "protein": 0, "carbs": 17, "fat": 0, "fiber": 0, "category": "sweeteners", "serving": "1 tbsp"}
     ];
 
-    // Initialize the application
+    // Initialize the application with defensive programming
     async init() {
         console.log('🚀 Initializing Diet Tracker...');
-        
         try {
             // Load data first
             await this.loadData();
-            
+
+            // Auto-fill today's date in form to prevent validation blocking
+            this.autoFillDate();
+
             // Setup event listeners with delay to ensure DOM is ready
             setTimeout(() => {
                 this.setupEventListeners();
                 this.populatePresetFoods();
                 this.setCurrentDate();
                 this.loadProfile();
-                
+
                 // Load theme preference
                 this.loadThemePreference();
-                
+
                 // Render initial views
                 this.renderDailyView();
                 this.renderWeeklyView();
-                
+
                 // Auto-save setup
                 this.setupAutoSave();
-                
                 this.showStatus('Diet Tracker loaded successfully! 🎉', 'success');
                 console.log('✅ Diet Tracker initialized successfully');
             }, 100);
@@ -140,18 +148,31 @@ class DietTracker {
         }
     }
 
+    // Auto-fill date input to prevent form validation blocking
+    autoFillDate() {
+        try {
+            const dateInput = document.getElementById('entryDate') || document.querySelector('input[type="date"]');
+            if (dateInput && !dateInput.value) {
+                dateInput.value = this.currentDate;
+                console.log('✅ Auto-filled date input with today:', this.currentDate);
+            }
+        } catch (error) {
+            console.error('Error auto-filling date:', error);
+        }
+    }
+
     // Setup auto-save functionality
     setupAutoSave() {
         // Auto-save every 30 seconds
         setInterval(() => {
             this.saveData();
         }, 30000);
-        
+
         // Save on page unload
         window.addEventListener('beforeunload', () => {
             this.saveData();
         });
-        
+
         // Save on visibility change (when user switches tabs)
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
@@ -160,45 +181,46 @@ class DietTracker {
         });
     }
 
-    // Setup all event listeners
+    // Setup all event listeners with defensive programming
     setupEventListeners() {
         console.log('🔗 Setting up event listeners...');
-        
-        // Tab navigation - use direct event listeners
-        this.setupTabNavigation();
-        
-        // Button handlers
-        this.setupButtonHandlers();
-        
-        // Modal handlers
-        this.setupModalHandlers();
-        
-        // Form handlers
-        this.setupFormHandlers();
-        
-        // Navigation handlers
-        this.setupNavigationHandlers();
-        
-        // Export/Import handlers
-        this.setupExportImportHandlers();
-        
-        // Quick actions
-        this.setupQuickActions();
-        
-        // Keyboard shortcuts
-        this.setupKeyboardShortcuts();
-        
-        console.log('✅ Event listeners set up successfully');
+        try {
+            // Tab navigation
+            this.setupTabNavigation();
+
+            // Button handlers
+            this.setupButtonHandlers();
+
+            // Modal handlers
+            this.setupModalHandlers();
+
+            // Form handlers
+            this.setupFormHandlers();
+
+            // Navigation handlers
+            this.setupNavigationHandlers();
+
+            // Export handlers (simplified)
+            this.setupExportHandlers();
+
+            // Quick actions
+            this.setupQuickActions();
+
+            // Keyboard shortcuts
+            this.setupKeyboardShortcuts();
+
+            console.log('✅ Event listeners set up successfully');
+        } catch (error) {
+            console.error('❌ Error setting up event listeners:', error);
+        }
     }
 
     setupTabNavigation() {
-        // Tab navigation with proper event handling
         document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const tabName = button.getAttribute('data-tab');
-                console.log('Tab clicked:', tabName);
                 if (tabName) {
                     this.switchTab(tabName);
                 }
@@ -212,29 +234,16 @@ class DietTracker {
         if (addEntryBtn) {
             addEntryBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
-                console.log('Add entry button clicked');
                 this.openAddEntryModal();
             });
         }
 
-        // Profile button  
+        // Profile button
         const profileBtn = document.getElementById('profileBtn');
         if (profileBtn) {
             profileBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 this.openProfileModal();
-            });
-        }
-
-        // Backup button
-        const backupBtn = document.getElementById('backupBtn');
-        if (backupBtn) {
-            backupBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.showBackupOptions();
             });
         }
 
@@ -259,19 +268,6 @@ class DietTracker {
             }
         });
 
-        // Cancel buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'cancelEntry') {
-                e.preventDefault();
-                this.closeModal('addEntryModal');
-            }
-            
-            if (e.target.id === 'cancelProfile') {
-                e.preventDefault();
-                this.closeModal('profileModal');
-            }
-        });
-
         // Entry actions - delegated event handling
         document.addEventListener('click', (e) => {
             if (e.target.closest('.edit-entry-btn')) {
@@ -283,7 +279,7 @@ class DietTracker {
                     this.editEntry(entry);
                 }
             }
-            
+
             if (e.target.closest('.delete-entry-btn')) {
                 e.preventDefault();
                 const entryItem = e.target.closest('.entry-item');
@@ -292,7 +288,7 @@ class DietTracker {
                     this.deleteEntry(entryId);
                 }
             }
-            
+
             if (e.target.closest('.add-food-btn')) {
                 e.preventDefault();
                 this.openAddEntryModal();
@@ -311,11 +307,11 @@ class DietTracker {
     setupFormHandlers() {
         const entryForm = document.getElementById('entryForm');
         const profileForm = document.getElementById('profileForm');
-        
+
         if (entryForm) {
             entryForm.addEventListener('submit', (e) => this.saveEntry(e));
         }
-        
+
         if (profileForm) {
             profileForm.addEventListener('submit', (e) => this.saveProfile(e));
         }
@@ -373,16 +369,11 @@ class DietTracker {
         }
     }
 
-    setupExportImportHandlers() {
+    // Simplified export handlers - only CSV and PDF
+    setupExportHandlers() {
         const exportButtons = {
             'exportCSV': () => this.exportCSV(),
-            'exportXLSX': () => this.exportXLSX(),
-            'exportPDF': () => this.exportPDF(),
-            'getSheetsTemplate': () => this.downloadSheetsTemplate(),
-            'importCSV': () => this.triggerCSVImport(),
-            'backupJSON': () => this.exportBackupJSON(),
-            'restoreJSON': () => this.triggerJSONRestore(),
-            'clearData': () => this.clearAllData()
+            'exportPDF': () => this.exportPDF()
         };
 
         Object.entries(exportButtons).forEach(([id, handler]) => {
@@ -394,18 +385,6 @@ class DietTracker {
                 });
             }
         });
-
-        // File inputs
-        const csvFileInput = document.getElementById('csvFileInput');
-        const jsonFileInput = document.getElementById('jsonFileInput');
-        
-        if (csvFileInput) {
-            csvFileInput.addEventListener('change', (e) => this.handleCSVImport(e));
-        }
-        
-        if (jsonFileInput) {
-            jsonFileInput.addEventListener('change', (e) => this.handleJSONRestore(e));
-        }
     }
 
     setupQuickActions() {
@@ -413,8 +392,8 @@ class DietTracker {
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('water-btn')) {
                 e.preventDefault();
-                const amount = parseInt(e.target.getAttribute('data-amount'));
-                if (amount) {
+                const amount = safeNumber(e.target.getAttribute('data-amount'));
+                if (amount > 0) {
                     this.addWater(amount);
                 }
             }
@@ -427,7 +406,7 @@ class DietTracker {
             if (['input', 'textarea', 'select'].includes(e.target.tagName.toLowerCase())) {
                 return;
             }
-            
+
             if (e.ctrlKey || e.metaKey) {
                 switch (e.key) {
                     case 'n':
@@ -447,60 +426,60 @@ class DietTracker {
     // Tab switching with proper content management
     switchTab(tabName) {
         console.log(`🔄 Switching to tab: ${tabName}`);
-        
-        // Remove active states
-        document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.classList.remove('active');
-            btn.setAttribute('aria-selected', 'false');
-        });
-        
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
+        try {
+            // Remove active states
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
 
-        // Activate selected tab
-        const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
-        if (selectedTab) {
-            selectedTab.classList.add('active');
-            selectedTab.setAttribute('aria-selected', 'true');
+            // Activate selected tab
+            const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.setAttribute('aria-selected', 'true');
+            }
+
+            // Show content based on tab
+            let targetContentId;
+            switch(tabName) {
+                case 'daily':
+                    targetContentId = 'dailyTab';
+                    break;
+                case 'weekly':
+                    targetContentId = 'weeklyTab';
+                    break;
+                case 'analytics':
+                    targetContentId = 'analyticsTab';
+                    this.loadAndRenderCharts();
+                    break;
+                case 'export':
+                    targetContentId = 'exportTab';
+                    break;
+                default:
+                    targetContentId = 'dailyTab';
+            }
+
+            const selectedContent = document.getElementById(targetContentId);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+
+            // Update URL hash
+            window.history.replaceState(null, null, `#${tabName}`);
+        } catch (error) {
+            console.error('Error switching tabs:', error);
         }
-
-        // Show content based on tab
-        let targetContentId;
-        switch(tabName) {
-            case 'daily':
-                targetContentId = 'dailyTab';
-                break;
-            case 'weekly':
-                targetContentId = 'weeklyTab';
-                break;
-            case 'analytics':
-                targetContentId = 'analyticsTab';
-                this.loadAndRenderCharts();
-                break;
-            case 'export':
-                targetContentId = 'exportTab';
-                break;
-            default:
-                targetContentId = 'dailyTab';
-        }
-
-        const selectedContent = document.getElementById(targetContentId);
-        if (selectedContent) {
-            selectedContent.classList.add('active');
-        }
-
-        // Update URL hash
-        window.history.replaceState(null, null, `#${tabName}`);
-        
-        console.log(`✅ Tab switched to: ${tabName}`);
     }
 
-    // Charts loading and rendering
+    // Charts loading and rendering with defensive programming
     async loadAndRenderCharts() {
         if (!this.chartsLoaded) {
             try {
-                await this.loadScript('https://cdn.jsdelivr.net/npm/chart.js');
+                await this.loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js');
                 this.chartsLoaded = true;
                 console.log('✅ Chart.js loaded');
             } catch (error) {
@@ -509,19 +488,22 @@ class DietTracker {
                 return;
             }
         }
-
         setTimeout(() => this.renderCharts(), 300);
     }
 
     renderCharts() {
         if (typeof Chart === 'undefined') {
-            this.showStatus('Charts library not loaded', 'error');
+            console.warn('Chart.js not available');
             return;
         }
 
-        this.renderCaloriesChart();
-        this.renderMacrosChart();
-        this.renderWeeklyChart();
+        try {
+            this.renderCaloriesChart();
+            this.renderMacrosChart();
+            this.renderWeeklyChart();
+        } catch (error) {
+            console.error('Error rendering charts:', error);
+        }
     }
 
     renderCaloriesChart() {
@@ -532,57 +514,56 @@ class DietTracker {
             this.charts.calories.destroy();
         }
 
-        // Get last 7 days data
-        const days = [];
-        const calories = [];
-        const today = new Date();
+        try {
+            // Get last 7 days data
+            const days = [];
+            const calories = [];
+            const today = new Date();
 
-        for (let i = 6; i >= 0; i--) {
-            const date = new Date(today);
-            date.setDate(date.getDate() - i);
-            const dateString = date.toISOString().split('T')[0];
-            
-            const dayEntries = this.entries.filter(entry => entry.date === dateString);
-            const summary = this.calculateDailySummary(dayEntries);
-            
-            days.push(date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric'}));
-            calories.push(Math.round(summary.calories));
-        }
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateString = date.toISOString().split('T')[0];
+                const dayEntries = this.entries.filter(entry => entry.date === dateString);
+                const summary = this.calculateDailySummary(dayEntries);
 
-        this.charts.calories = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: days,
-                datasets: [{
-                    label: 'Calories',
-                    data: calories,
-                    borderColor: '#1FB8CD',
-                    backgroundColor: 'rgba(31, 184, 205, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }, {
-                    label: 'Target',
-                    data: Array(7).fill(this.profile.calories),
-                    borderColor: '#FFC185',
-                    borderDash: [5, 5],
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+                days.push(date.toLocaleDateString('en-US', {weekday: 'short', day: 'numeric'}));
+                calories.push(Math.round(safeNumber(summary.calories)));
+            }
+
+            this.charts.calories = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: days,
+                    datasets: [{
+                        label: 'Calories',
+                        data: calories,
+                        borderColor: '#1FB8CD',
+                        backgroundColor: 'rgba(31, 184, 205, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Target',
+                        data: Array(7).fill(safeNumber(this.profile.calories)),
+                        borderColor: '#FFC185',
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
                     }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            console.error('Error rendering calories chart:', error);
+        }
     }
 
     renderMacrosChart() {
@@ -593,28 +574,34 @@ class DietTracker {
             this.charts.macros.destroy();
         }
 
-        const todayEntries = this.entries.filter(entry => entry.date === this.currentDate);
-        const summary = this.calculateDailySummary(todayEntries);
+        try {
+            const todayEntries = this.entries.filter(entry => entry.date === this.currentDate);
+            const summary = this.calculateDailySummary(todayEntries);
 
-        this.charts.macros = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Protein', 'Carbs', 'Fat'],
-                datasets: [{
-                    data: [summary.protein * 4, summary.carbs * 4, summary.fat * 9],
-                    backgroundColor: ['#1FB8CD', '#FFC185', '#B4413C']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
+            this.charts.macros = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Protein', 'Carbs', 'Fat'],
+                    datasets: [{
+                        data: [
+                            safeNumber(summary.protein) * 4,
+                            safeNumber(summary.carbs) * 4,
+                            safeNumber(summary.fat) * 9
+                        ],
+                        backgroundColor: ['#1FB8CD', '#FFC185', '#B4413C']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
                     }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            console.error('Error rendering macros chart:', error);
+        }
     }
 
     renderWeeklyChart() {
@@ -625,47 +612,46 @@ class DietTracker {
             this.charts.weekly.destroy();
         }
 
-        const weekStart = new Date(this.currentWeekStart);
-        const days = [];
-        const weeklyCalories = [];
+        try {
+            const weekStart = new Date(this.currentWeekStart);
+            const days = [];
+            const weeklyCalories = [];
 
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(weekStart);
-            date.setDate(date.getDate() + i);
-            const dateString = date.toISOString().split('T')[0];
-            
-            const dayEntries = this.entries.filter(entry => entry.date === dateString);
-            const summary = this.calculateDailySummary(dayEntries);
-            
-            days.push(date.toLocaleDateString('en-US', {weekday: 'short'}));
-            weeklyCalories.push(Math.round(summary.calories));
-        }
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(weekStart);
+                date.setDate(date.getDate() + i);
+                const dateString = date.toISOString().split('T')[0];
+                const dayEntries = this.entries.filter(entry => entry.date === dateString);
+                const summary = this.calculateDailySummary(dayEntries);
 
-        this.charts.weekly = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: days,
-                datasets: [{
-                    label: 'Calories',
-                    data: weeklyCalories,
-                    backgroundColor: '#1FB8CD'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+                days.push(date.toLocaleDateString('en-US', {weekday: 'short'}));
+                weeklyCalories.push(Math.round(safeNumber(summary.calories)));
+            }
+
+            this.charts.weekly = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: days,
+                    datasets: [{
+                        label: 'Calories',
+                        data: weeklyCalories,
+                        backgroundColor: '#1FB8CD'
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
                     }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            console.error('Error rendering weekly chart:', error);
+        }
     }
 
     // Navigation methods
@@ -673,12 +659,11 @@ class DietTracker {
         const date = new Date(this.currentDate);
         date.setDate(date.getDate() + days);
         this.currentDate = date.toISOString().split('T')[0];
-        
+
         const dateInput = document.getElementById('currentDate');
         if (dateInput) {
             dateInput.value = this.currentDate;
         }
-        
         this.renderDailyView();
     }
 
@@ -705,80 +690,93 @@ class DietTracker {
 
     // Modal management
     openAddEntryModal(entry = null) {
-        console.log('Opening add entry modal', entry ? 'for editing' : 'for new entry');
-        
-        const modal = document.getElementById('addEntryModal');
-        const form = document.getElementById('entryForm');
-        
-        if (!modal || !form) {
-            console.error('Modal elements not found');
-            return;
-        }
-        
-        if (entry) {
-            this.currentEditingEntry = entry;
-            document.getElementById('modalTitle').textContent = 'Edit Food Entry';
-            document.getElementById('saveEntry').textContent = 'Update Entry';
-            this.populateEntryForm(entry);
-        } else {
-            this.currentEditingEntry = null;
-            document.getElementById('modalTitle').textContent = 'Add Food Entry';
-            document.getElementById('saveEntry').textContent = 'Add Entry';
-            form.reset();
-            document.getElementById('entryDate').value = this.currentDate;
-        }
-        
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        
-        // Focus first input
-        setTimeout(() => {
-            const firstInput = form.querySelector('input, select');
-            if (firstInput) {
-                firstInput.focus();
+        try {
+            const modal = document.getElementById('addEntryModal');
+            const form = document.getElementById('entryForm');
+            if (!modal || !form) {
+                console.error('Modal elements not found');
+                return;
             }
-        }, 100);
+
+            if (entry) {
+                this.currentEditingEntry = entry;
+                const modalTitle = document.getElementById('modalTitle');
+                const saveBtn = document.getElementById('saveEntry');
+                if (modalTitle) modalTitle.textContent = 'Edit Food Entry';
+                if (saveBtn) saveBtn.textContent = 'Update Entry';
+                this.populateEntryForm(entry);
+            } else {
+                this.currentEditingEntry = null;
+                const modalTitle = document.getElementById('modalTitle');
+                const saveBtn = document.getElementById('saveEntry');
+                if (modalTitle) modalTitle.textContent = 'Add Food Entry';
+                if (saveBtn) saveBtn.textContent = 'Add Entry';
+                form.reset();
+                const entryDate = document.getElementById('entryDate');
+                if (entryDate) entryDate.value = this.currentDate;
+            }
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Focus first input
+            setTimeout(() => {
+                const firstInput = form.querySelector('input, select');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 100);
+        } catch (error) {
+            console.error('Error opening add entry modal:', error);
+        }
     }
 
     openProfileModal() {
-        const modal = document.getElementById('profileModal');
-        if (!modal) return;
-        
-        this.populateProfileForm();
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        
-        setTimeout(() => {
-            const firstInput = modal.querySelector('input');
-            if (firstInput) {
-                firstInput.focus();
-            }
-        }, 100);
-    }
+        try {
+            const modal = document.getElementById('profileModal');
+            if (!modal) return;
 
-    closeModal(modalId) {
-        console.log('Closing modal:', modalId);
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-            this.currentEditingEntry = null;
+            this.populateProfileForm();
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => {
+                const firstInput = modal.querySelector('input');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 100);
+        } catch (error) {
+            console.error('Error opening profile modal:', error);
         }
     }
 
-    // Form population
+    closeModal(modalId) {
+        try {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+                this.currentEditingEntry = null;
+            }
+        } catch (error) {
+            console.error('Error closing modal:', error);
+        }
+    }
+
+    // Form population with safe numeric parsing
     populateEntryForm(entry) {
         const fields = {
             'entryDate': entry.date,
             'entryMealTime': entry.mealTime,
             'entryFood': entry.foodName,
             'entryServing': entry.servingSize,
-            'entryCalories': entry.calories,
-            'entryProtein': entry.protein,
-            'entryCarbs': entry.carbs,
-            'entryFat': entry.fat,
-            'entryFiber': entry.fiber || 0,
-            'entryWater': entry.waterIntake || 0,
+            'entryCalories': safeNumber(entry.calories),
+            'entryProtein': safeNumber(entry.protein),
+            'entryCarbs': safeNumber(entry.carbs),
+            'entryFat': safeNumber(entry.fat),
+            'entryFiber': safeNumber(entry.fiber),
+            'entryWater': safeNumber(entry.waterIntake),
             'entryNotes': entry.notes || ''
         };
 
@@ -792,12 +790,12 @@ class DietTracker {
 
     populateProfileForm() {
         const fields = {
-            'targetCalories': this.profile.calories,
-            'targetProtein': this.profile.protein,
-            'targetCarbs': this.profile.carbs,
-            'targetFat': this.profile.fat,
-            'targetFiber': this.profile.fiber,
-            'targetWater': this.profile.water
+            'targetCalories': safeNumber(this.profile.calories),
+            'targetProtein': safeNumber(this.profile.protein),
+            'targetCarbs': safeNumber(this.profile.carbs),
+            'targetFat': safeNumber(this.profile.fat),
+            'targetFiber': safeNumber(this.profile.fiber),
+            'targetWater': safeNumber(this.profile.water)
         };
 
         Object.entries(fields).forEach(([id, value]) => {
@@ -811,42 +809,44 @@ class DietTracker {
     populatePresetFoods() {
         const select = document.getElementById('presetFoods');
         if (!select) return;
-        
-        select.innerHTML = '<option value="">Choose from Indian foods database...</option>';
-        
-        const categories = [...new Set(this.indianFoods.map(food => food.category))];
-        
-        categories.forEach(category => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = this.capitalizeFirst(category);
-            
-            this.indianFoods
-                .filter(food => food.category === category)
-                .forEach(food => {
-                    const option = document.createElement('option');
-                    option.value = JSON.stringify(food);
-                    option.textContent = food.name;
-                    optgroup.appendChild(option);
-                });
-            
-            select.appendChild(optgroup);
-        });
+
+        try {
+            select.innerHTML = '<option value="">Select a preset food...</option>';
+
+            const categories = [...new Set(this.indianFoods.map(food => food.category))];
+            categories.forEach(category => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = this.capitalizeFirst(category);
+
+                this.indianFoods
+                    .filter(food => food.category === category)
+                    .forEach(food => {
+                        const option = document.createElement('option');
+                        option.value = JSON.stringify(food);
+                        option.textContent = food.name;
+                        optgroup.appendChild(option);
+                    });
+
+                select.appendChild(optgroup);
+            });
+        } catch (error) {
+            console.error('Error populating preset foods:', error);
+        }
     }
 
     selectPresetFood(event) {
         if (!event.target.value) return;
-        
+
         try {
             const food = JSON.parse(event.target.value);
-            
             const fields = {
                 'entryFood': food.name,
                 'entryServing': food.serving,
-                'entryCalories': food.calories,
-                'entryProtein': food.protein,
-                'entryCarbs': food.carbs,
-                'entryFat': food.fat,
-                'entryFiber': food.fiber || 0
+                'entryCalories': safeNumber(food.calories),
+                'entryProtein': safeNumber(food.protein),
+                'entryCarbs': safeNumber(food.carbs),
+                'entryFat': safeNumber(food.fat),
+                'entryFiber': safeNumber(food.fiber)
             };
 
             Object.entries(fields).forEach(([id, value]) => {
@@ -855,7 +855,7 @@ class DietTracker {
                     element.value = value;
                 }
             });
-            
+
             event.target.selectedIndex = 0;
             this.showStatus(`Selected ${food.name} 🥗`, 'success');
         } catch (error) {
@@ -863,53 +863,55 @@ class DietTracker {
         }
     }
 
-    // Entry management
+    // Entry management with safe numeric parsing
     saveEntry(event) {
         event.preventDefault();
         console.log('Saving entry...');
-        
-        const formData = this.getFormData();
-        if (!this.validateEntryForm(formData)) return;
 
-        const entry = {
-            id: this.currentEditingEntry?.id || this.generateId(),
-            date: formData.entryDate,
-            mealTime: formData.entryMealTime,
-            foodName: formData.entryFood,
-            servingSize: formData.entryServing,
-            calories: parseFloat(formData.entryCalories) || 0,
-            protein: parseFloat(formData.entryProtein) || 0,
-            carbs: parseFloat(formData.entryCarbs) || 0,
-            fat: parseFloat(formData.entryFat) || 0,
-            fiber: parseFloat(formData.entryFiber) || 0,
-            waterIntake: parseFloat(formData.entryWater) || 0,
-            notes: formData.entryNotes || '',
-            timestamp: new Date().toISOString()
-        };
+        try {
+            const formData = this.getFormData();
+            if (!this.validateEntryForm(formData)) return;
 
-        if (this.currentEditingEntry) {
-            const index = this.entries.findIndex(e => e.id === entry.id);
-            if (index !== -1) {
-                this.entries[index] = entry;
-                this.showStatus('Entry updated! ✏️', 'success');
+            const entry = {
+                id: this.currentEditingEntry?.id || this.generateId(),
+                date: formData.entryDate,
+                mealTime: formData.entryMealTime,
+                foodName: formData.entryFood,
+                servingSize: formData.entryServing,
+                calories: safeNumber(formData.entryCalories),
+                protein: safeNumber(formData.entryProtein),
+                carbs: safeNumber(formData.entryCarbs),
+                fat: safeNumber(formData.entryFat),
+                fiber: safeNumber(formData.entryFiber),
+                waterIntake: safeNumber(formData.entryWater),
+                notes: formData.entryNotes || '',
+                timestamp: new Date().toISOString()
+            };
+
+            if (this.currentEditingEntry) {
+                const index = this.entries.findIndex(e => e.id === entry.id);
+                if (index !== -1) {
+                    this.entries[index] = entry;
+                    this.showStatus('Entry updated! ✏️', 'success');
+                }
+            } else {
+                this.entries.push(entry);
+                this.showStatus('Entry added! ➕', 'success');
             }
-        } else {
-            this.entries.push(entry);
-            this.showStatus('Entry added! ➕', 'success');
-        }
 
-        this.saveData();
-        this.renderDailyView();
-        this.renderWeeklyView();
-        this.closeModal('addEntryModal');
-        
-        console.log('Entry saved:', entry);
+            this.saveData();
+            this.renderDailyView();
+            this.renderWeeklyView();
+            this.closeModal('addEntryModal');
+        } catch (error) {
+            console.error('Error saving entry:', error);
+            this.showStatus('Error saving entry', 'error');
+        }
     }
 
     getFormData() {
         const form = document.getElementById('entryForm');
         const formData = {};
-        
         if (form) {
             const elements = form.querySelectorAll('input, select, textarea');
             elements.forEach(element => {
@@ -918,26 +920,24 @@ class DietTracker {
                 }
             });
         }
-        
         return formData;
     }
 
     validateEntryForm(formData) {
-        const required = ['entryFood', 'entryDate', 'entryMealTime', 'entryServing', 'entryCalories'];
-        
+        const required = ['entryFood', 'entryDate', 'entryMealTime', 'entryServing'];
         for (const field of required) {
             if (!formData[field] || formData[field].toString().trim() === '') {
                 this.showStatus('Please fill in all required fields', 'error');
                 return false;
             }
         }
-        
-        const calories = parseFloat(formData.entryCalories);
-        if (isNaN(calories) || calories < 0) {
+
+        const calories = safeNumber(formData.entryCalories);
+        if (calories < 0) {
             this.showStatus('Calories must be a positive number', 'error');
             return false;
         }
-        
+
         return true;
     }
 
@@ -948,7 +948,7 @@ class DietTracker {
     deleteEntry(entryId) {
         const entry = this.entries.find(e => e.id === entryId);
         if (!entry) return;
-        
+
         if (confirm(`Delete "${entry.foodName}"?`)) {
             this.entries = this.entries.filter(e => e.id !== entryId);
             this.saveData();
@@ -960,29 +960,32 @@ class DietTracker {
 
     saveProfile(event) {
         event.preventDefault();
-        
-        const formData = this.getProfileFormData();
-        
-        this.profile = {
-            calories: Math.max(500, parseInt(formData.targetCalories) || 2000),
-            protein: Math.max(10, parseInt(formData.targetProtein) || 150),
-            carbs: Math.max(20, parseInt(formData.targetCarbs) || 250),
-            fat: Math.max(10, parseInt(formData.targetFat) || 65),
-            fiber: Math.max(5, parseInt(formData.targetFiber) || 25),
-            water: Math.max(500, parseInt(formData.targetWater) || 2000)
-        };
 
-        this.saveData();
-        this.loadProfile();
-        this.renderDailyView();
-        this.closeModal('profileModal');
-        this.showStatus('Profile saved! ⚙️', 'success');
+        try {
+            const formData = this.getProfileFormData();
+            this.profile = {
+                calories: Math.max(500, safeNumber(formData.targetCalories) || 2000),
+                protein: Math.max(10, safeNumber(formData.targetProtein) || 150),
+                carbs: Math.max(20, safeNumber(formData.targetCarbs) || 250),
+                fat: Math.max(10, safeNumber(formData.targetFat) || 65),
+                fiber: Math.max(5, safeNumber(formData.targetFiber) || 25),
+                water: Math.max(500, safeNumber(formData.targetWater) || 2000)
+            };
+
+            this.saveData();
+            this.loadProfile();
+            this.renderDailyView();
+            this.closeModal('profileModal');
+            this.showStatus('Profile saved! ⚙️', 'success');
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            this.showStatus('Error saving profile', 'error');
+        }
     }
 
     getProfileFormData() {
         const form = document.getElementById('profileForm');
         const formData = {};
-        
         if (form) {
             const inputs = form.querySelectorAll('input');
             inputs.forEach(input => {
@@ -991,18 +994,17 @@ class DietTracker {
                 }
             });
         }
-        
         return formData;
     }
 
     loadProfile() {
         const targets = {
-            'caloriesTarget': this.profile.calories,
-            'proteinTarget': this.profile.protein,
-            'carbsTarget': this.profile.carbs,
-            'fatTarget': this.profile.fat,
-            'fiberTarget': this.profile.fiber,
-            'waterTarget': this.profile.water
+            'caloriesTarget': safeNumber(this.profile.calories),
+            'proteinTarget': safeNumber(this.profile.protein),
+            'carbsTarget': safeNumber(this.profile.carbs),
+            'fatTarget': safeNumber(this.profile.fat),
+            'fiberTarget': safeNumber(this.profile.fiber),
+            'waterTarget': safeNumber(this.profile.water)
         };
 
         Object.entries(targets).forEach(([id, value]) => {
@@ -1016,7 +1018,6 @@ class DietTracker {
     // Water tracking
     addWater(amount) {
         console.log('Adding water:', amount);
-        
         const waterEntry = {
             id: this.generateId(),
             date: this.currentDate,
@@ -1028,7 +1029,7 @@ class DietTracker {
             carbs: 0,
             fat: 0,
             fiber: 0,
-            waterIntake: amount,
+            waterIntake: safeNumber(amount),
             notes: 'Quick add water',
             timestamp: new Date().toISOString()
         };
@@ -1039,25 +1040,26 @@ class DietTracker {
         this.showStatus(`Added ${amount}ml water! 💧`, 'success');
     }
 
-    // Rendering
+    // Rendering with safe numeric handling
     renderDailyView() {
-        const dayEntries = this.entries.filter(entry => entry.date === this.currentDate);
-        const summary = this.calculateDailySummary(dayEntries);
-        
-        this.updateSummaryCards(summary);
-        this.renderMealSections(dayEntries);
-        
-        console.log(`Daily view rendered: ${dayEntries.length} entries for ${this.currentDate}`);
+        try {
+            const dayEntries = this.entries.filter(entry => entry.date === this.currentDate);
+            const summary = this.calculateDailySummary(dayEntries);
+            this.updateSummaryCards(summary);
+            this.renderMealSections(dayEntries);
+        } catch (error) {
+            console.error('Error rendering daily view:', error);
+        }
     }
 
     updateSummaryCards(summary) {
         const fields = {
-            'caloriesCurrent': Math.round(summary.calories),
-            'proteinCurrent': Math.round(summary.protein),
-            'carbsCurrent': Math.round(summary.carbs),
-            'fatCurrent': Math.round(summary.fat),
-            'fiberCurrent': Math.round(summary.fiber),
-            'waterCurrent': Math.round(summary.water)
+            'caloriesCurrent': Math.round(safeNumber(summary.calories)),
+            'proteinCurrent': Math.round(safeNumber(summary.protein)),
+            'carbsCurrent': Math.round(safeNumber(summary.carbs)),
+            'fatCurrent': Math.round(safeNumber(summary.fat)),
+            'fiberCurrent': Math.round(safeNumber(summary.fiber)),
+            'waterCurrent': Math.round(safeNumber(summary.water))
         };
 
         Object.entries(fields).forEach(([id, value]) => {
@@ -1067,47 +1069,49 @@ class DietTracker {
             }
         });
 
-        // Update progress bars
-        this.updateProgressBar('caloriesProgress', summary.calories, this.profile.calories);
-        this.updateProgressBar('proteinProgress', summary.protein, this.profile.protein);
-        this.updateProgressBar('carbsProgress', summary.carbs, this.profile.carbs);
-        this.updateProgressBar('fatProgress', summary.fat, this.profile.fat);
-        this.updateProgressBar('fiberProgress', summary.fiber, this.profile.fiber);
+        // Update progress bars with safe numbers
+        this.updateProgressBar('caloriesProgress', safeNumber(summary.calories), safeNumber(this.profile.calories));
+        this.updateProgressBar('proteinProgress', safeNumber(summary.protein), safeNumber(this.profile.protein));
+        this.updateProgressBar('carbsProgress', safeNumber(summary.carbs), safeNumber(this.profile.carbs));
+        this.updateProgressBar('fatProgress', safeNumber(summary.fat), safeNumber(this.profile.fat));
+        this.updateProgressBar('fiberProgress', safeNumber(summary.fiber), safeNumber(this.profile.fiber));
     }
 
     updateProgressBar(elementId, current, target) {
         const progressBar = document.getElementById(elementId);
         if (!progressBar) return;
-        
-        const percentage = Math.min((current / target) * 100, 100);
+
+        const safeCurrent = safeNumber(current);
+        const safeTarget = safeNumber(target);
+        const percentage = safeTarget > 0 ? Math.min((safeCurrent / safeTarget) * 100, 100) : 0;
         progressBar.style.width = `${percentage}%`;
     }
 
     renderMealSections(dayEntries) {
         const mealTypes = ['breakfast', 'mid-morning', 'lunch', 'snack', 'dinner'];
-        
+
         mealTypes.forEach(mealType => {
             const mealSection = document.querySelector(`[data-meal="${mealType}"]`);
             if (!mealSection) return;
-            
+
             const mealEntries = dayEntries.filter(entry => entry.mealTime === mealType);
             const mealContainer = mealSection.querySelector('.meal-entries');
             const caloriesDisplay = mealSection.querySelector('.meal-calories');
-            
-            const mealCalories = mealEntries.reduce((sum, entry) => sum + (entry.calories || 0), 0);
-            
+
+            const mealCalories = mealEntries.reduce((sum, entry) => sum + safeNumber(entry.calories), 0);
+
             if (caloriesDisplay) {
                 caloriesDisplay.textContent = `${Math.round(mealCalories)} kcal`;
             }
-            
+
             if (mealContainer) {
                 mealContainer.innerHTML = '';
-                
+
                 if (mealEntries.length === 0) {
                     mealContainer.innerHTML = `
                         <div class="empty-meal">
                             <p>No entries for this meal.</p>
-                            <button class="btn btn--outline btn--sm add-food-btn">Add food</button>
+                            <button class="btn btn--primary btn--sm add-food-btn">Add Food</button>
                         </div>
                     `;
                 } else {
@@ -1121,22 +1125,25 @@ class DietTracker {
     }
 
     createEntryElement(entry) {
-        const div = document.createElement('div');
-        div.className = 'entry-item';
-        div.dataset.entryId = entry.id;
-        
-        div.innerHTML = `
+        const entryDiv = document.createElement('div');
+        entryDiv.className = 'entry-item';
+        entryDiv.dataset.entryId = entry.id;
+
+        const calories = Math.round(safeNumber(entry.calories));
+        const protein = Math.round(safeNumber(entry.protein));
+        const carbs = Math.round(safeNumber(entry.carbs));
+        const fat = Math.round(safeNumber(entry.fat));
+
+        entryDiv.innerHTML = `
             <div class="entry-details">
-                <h4>${this.escapeHtml(entry.foodName)}</h4>
+                <h4>${entry.foodName}</h4>
                 <div class="entry-meta">
-                    <span>📏 ${this.escapeHtml(entry.servingSize)}</span>
-                    <span>🔥 ${entry.calories} kcal</span>
-                    <span>💪 ${entry.protein}g</span>
-                    <span>🌾 ${entry.carbs}g</span>
-                    <span>🥑 ${entry.fat}g</span>
-                    ${entry.fiber > 0 ? `<span>🌿 ${entry.fiber}g fiber</span>` : ''}
-                    ${entry.waterIntake > 0 ? `<span>💧 ${entry.waterIntake}ml</span>` : ''}
-                    ${entry.notes ? `<span title="${this.escapeHtml(entry.notes)}">📝</span>` : ''}
+                    <span>Serving: ${entry.servingSize}</span>
+                    <span>Calories: ${calories}</span>
+                    <span>Protein: ${protein}g</span>
+                    <span>Carbs: ${carbs}g</span>
+                    <span>Fat: ${fat}g</span>
+                    ${entry.notes ? `<span>Notes: ${entry.notes}</span>` : ''}
                 </div>
             </div>
             <div class="entry-actions">
@@ -1145,282 +1152,398 @@ class DietTracker {
                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                     </svg>
                 </button>
-                <button class="delete-entry-btn" title="Delete entry">
+                <button class="delete-entry-btn delete-btn" title="Delete entry">
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                        <path d="M19 13H5v-2h14v2z"/>
                     </svg>
                 </button>
             </div>
         `;
-        
-        return div;
+
+        return entryDiv;
     }
 
     renderWeeklyView() {
-        const weekStart = new Date(this.currentWeekStart);
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
-        
-        const weekRangeElement = document.getElementById('weekRange');
-        if (weekRangeElement) {
-            weekRangeElement.textContent = 
-                `Week of ${weekStart.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${weekEnd.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}`;
-        }
-        
-        const weeklyGrid = document.getElementById('weeklyGrid');
-        if (!weeklyGrid) return;
-        
-        weeklyGrid.innerHTML = '';
-        
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(weekStart);
-            date.setDate(date.getDate() + i);
-            const dateString = date.toISOString().split('T')[0];
-            
-            const dayEntries = this.entries.filter(entry => entry.date === dateString);
-            const summary = this.calculateDailySummary(dayEntries);
-            
-            const dayCard = this.createDayCard(date, summary, dayEntries.length);
-            weeklyGrid.appendChild(dayCard);
+        try {
+            const weekStart = new Date(this.currentWeekStart);
+            const weekRange = document.getElementById('weekRange');
+            if (weekRange) {
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+                weekRange.textContent = `Week of ${weekStart.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} - ${weekEnd.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})}`;
+            }
+
+            const weeklyGrid = document.querySelector('.weekly-grid');
+            if (!weeklyGrid) return;
+
+            weeklyGrid.innerHTML = '';
+
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(weekStart);
+                date.setDate(date.getDate() + i);
+                const dateString = date.toISOString().split('T')[0];
+                const dayEntries = this.entries.filter(entry => entry.date === dateString);
+                const summary = this.calculateDailySummary(dayEntries);
+
+                const dayCard = this.createDayCard(date, summary, dayEntries);
+                weeklyGrid.appendChild(dayCard);
+            }
+        } catch (error) {
+            console.error('Error rendering weekly view:', error);
         }
     }
 
-    createDayCard(date, summary, entryCount) {
-        const div = document.createElement('div');
-        div.className = 'day-card';
-        div.style.cursor = 'pointer';
-        
-        const isToday = date.toISOString().split('T')[0] === new Date().toISOString().split('T')[0];
-        
-        div.innerHTML = `
+    createDayCard(date, summary, entries) {
+        const dayCard = document.createElement('div');
+        dayCard.className = 'day-card';
+
+        const calories = Math.round(safeNumber(summary.calories));
+        const protein = Math.round(safeNumber(summary.protein));
+        const carbs = Math.round(safeNumber(summary.carbs));
+        const fat = Math.round(safeNumber(summary.fat));
+
+        dayCard.innerHTML = `
             <div class="day-header">
-                <div class="day-date">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}${isToday ? ' 🔴' : ''}</div>
-                <h3 class="day-name">${date.toLocaleDateString('en-US', {weekday: 'short'})}</h3>
+                <div class="day-date">${date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</div>
+                <h3 class="day-name">${date.toLocaleDateString('en-US', {weekday: 'long'})}</h3>
             </div>
             <div class="day-summary">
-                <div class="day-calories">${Math.round(summary.calories)} kcal</div>
+                <div class="day-calories">${calories} kcal</div>
                 <div class="day-macros">
-                    <div>💪 ${Math.round(summary.protein)}g</div>
-                    <div>🌾 ${Math.round(summary.carbs)}g</div>
-                    <div>🥑 ${Math.round(summary.fat)}g</div>
+                    <div>P: ${protein}g</div>
+                    <div>C: ${carbs}g</div>
+                    <div>F: ${fat}g</div>
                 </div>
-                <div class="entry-count">
-                    ${entryCount} ${entryCount === 1 ? 'entry' : 'entries'}
-                </div>
+                <div class="entry-count">${entries.length} entries</div>
             </div>
         `;
-        
-        div.addEventListener('click', () => {
+
+        dayCard.addEventListener('click', () => {
             this.currentDate = date.toISOString().split('T')[0];
-            const dateInput = document.getElementById('currentDate');
-            if (dateInput) {
-                dateInput.value = this.currentDate;
-            }
             this.switchTab('daily');
             this.renderDailyView();
         });
-        
-        return div;
+
+        return dayCard;
     }
 
     calculateDailySummary(entries) {
-        return entries.reduce((summary, entry) => ({
-            calories: summary.calories + (entry.calories || 0),
-            protein: summary.protein + (entry.protein || 0),
-            carbs: summary.carbs + (entry.carbs || 0),
-            fat: summary.fat + (entry.fat || 0),
-            fiber: summary.fiber + (entry.fiber || 0),
-            water: summary.water + (entry.waterIntake || 0)
-        }), {
-            calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, water: 0
+        return entries.reduce((summary, entry) => {
+            summary.calories += safeNumber(entry.calories);
+            summary.protein += safeNumber(entry.protein);
+            summary.carbs += safeNumber(entry.carbs);
+            summary.fat += safeNumber(entry.fat);
+            summary.fiber += safeNumber(entry.fiber);
+            summary.water += safeNumber(entry.waterIntake);
+            return summary;
+        }, {
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            fiber: 0,
+            water: 0
         });
     }
 
-    // Export functions (simplified for working version)
-    async exportCSV() {
-        if (this.entries.length === 0) {
-            this.showStatus('No data to export', 'warning');
-            return;
-        }
-
-        const headers = ['Date', 'Meal', 'Food', 'Serving', 'Calories', 'Protein', 'Carbs', 'Fat', 'Fiber', 'Water', 'Notes'];
-        const csvData = [headers];
-        
-        this.entries.forEach(entry => {
-            csvData.push([
-                entry.date,
-                entry.mealTime,
-                entry.foodName,
-                entry.servingSize,
-                entry.calories || 0,
-                entry.protein || 0,
-                entry.carbs || 0,
-                entry.fat || 0,
-                entry.fiber || 0,
-                entry.waterIntake || 0,
-                entry.notes || ''
-            ]);
-        });
-        
-        const csvContent = '\uFEFF' + csvData.map(row => row.join(',')).join('\n');
-        this.downloadFile(csvContent, `diet-tracker-${this.getCurrentDateString()}.csv`, 'text/csv');
-        this.showStatus('CSV exported successfully! 📊', 'success');
-    }
-
-    async exportXLSX() {
-        this.showStatus('Excel export coming soon! Use CSV for now.', 'warning');
-    }
-
-    async exportPDF() {
-        this.showStatus('PDF export coming soon! Use CSV for now.', 'warning');
-    }
-
-    downloadSheetsTemplate() {
-        const templateData = [
-            ['Date', 'Meal', 'Food', 'Serving', 'Calories', 'Protein', 'Carbs', 'Fat', 'Fiber', 'Water', 'Notes'],
-            ['2025-08-15', 'breakfast', 'Roti', '2 pieces', 238, 6, 36, 4, 4, 0, 'With ghee'],
-            ['2025-08-15', 'lunch', 'Rice', '1 cup', 120, 2, 30, 0, 0, 300, ''],
-            ['2025-08-15', 'snack', 'Banana', '1 medium', 80, 1, 20, 0, 2, 200, '']
-        ];
-        
-        const csvContent = '\uFEFF' + templateData.map(row => row.join(',')).join('\n');
-        this.downloadFile(csvContent, 'diet-tracker-template.csv', 'text/csv');
-        this.showStatus('Template downloaded! Upload to Google Sheets.', 'success');
-    }
-
-    triggerCSVImport() {
-        const fileInput = document.getElementById('csvFileInput');
-        if (fileInput) fileInput.click();
-    }
-
-    async handleCSVImport(event) {
-        this.showStatus('CSV import coming soon!', 'warning');
-        event.target.value = '';
-    }
-
-    exportBackupJSON() {
-        const backupData = {
-            version: '1.0.0',
-            timestamp: new Date().toISOString(),
-            entries: this.entries,
-            profile: this.profile
-        };
-        
-        const jsonContent = JSON.stringify(backupData, null, 2);
-        this.downloadFile(jsonContent, `diet-tracker-backup-${this.getCurrentDateString()}.json`, 'application/json');
-        this.showStatus('Backup created! 💾', 'success');
-    }
-
-    triggerJSONRestore() {
-        const fileInput = document.getElementById('jsonFileInput');
-        if (fileInput) fileInput.click();
-    }
-
-    async handleJSONRestore(event) {
-        this.showStatus('JSON restore coming soon!', 'warning');
-        event.target.value = '';
-    }
-
-    clearAllData() {
-        if (confirm('Delete all data? This cannot be undone!')) {
-            this.entries = [];
-            this.saveData();
-            this.renderDailyView();
-            this.renderWeeklyView();
-            this.showStatus('All data cleared! 🗑️', 'success');
-        }
-    }
-
-    // Theme management
-    toggleTheme() {
-        const body = document.body;
-        const currentScheme = body.getAttribute('data-color-scheme');
-        const newScheme = currentScheme === 'dark' ? 'light' : 'dark';
-        
-        body.setAttribute('data-color-scheme', newScheme);
-        localStorage.setItem('theme', newScheme);
-        
-        this.showStatus(`${newScheme} theme activated! ${newScheme === 'dark' ? '🌙' : '☀️'}`, 'success');
-    }
-
-    loadThemePreference() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.body.setAttribute('data-color-scheme', savedTheme);
-        }
-    }
-
-    // Utility functions
-    generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
-    }
-
-    getCurrentDateString() {
-        return new Date().toISOString().split('T')[0];
-    }
-
-    capitalizeFirst(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    escapeHtml(unsafe) {
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    downloadFile(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-    async loadScript(src) {
-        return new Promise((resolve, reject) => {
-            if (document.querySelector(`script[src="${src}"]`)) {
-                resolve();
+    // Enhanced CSV Export with UTF-8 BOM and proper escaping
+    exportCSV() {
+        try {
+            if (this.entries.length === 0) {
+                this.showStatus('No entries to export', 'warning');
                 return;
             }
-            
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
+
+            const headers = ['Date', 'Meal Time', 'Food Name', 'Serving Size', 'Calories', 'Protein (g)', 'Carbs (g)', 'Fat (g)', 'Fiber (g)', 'Water (ml)', 'Notes'];
+
+            // Escape CSV field function
+            const escapeCSVField = (field) => {
+                if (field == null) return '';
+                const str = String(field);
+                if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+                    return '"' + str.replace(/"/g, '""') + '"';
+                }
+                return str;
+            };
+
+            // Create CSV content with UTF-8 BOM
+            let csvContent = '\uFEFF'; // UTF-8 BOM for Excel compatibility
+            csvContent += headers.join(',') + '\n';
+
+            this.entries.forEach(entry => {
+                const row = [
+                    escapeCSVField(entry.date),
+                    escapeCSVField(entry.mealTime),
+                    escapeCSVField(entry.foodName),
+                    escapeCSVField(entry.servingSize),
+                    safeNumber(entry.calories), // Raw number for Excel
+                    safeNumber(entry.protein),
+                    safeNumber(entry.carbs),
+                    safeNumber(entry.fat),
+                    safeNumber(entry.fiber),
+                    safeNumber(entry.waterIntake),
+                    escapeCSVField(entry.notes || '')
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const filename = `diet_tracker_${new Date().toISOString().split('T')[0]}.csv`;
+
+            this.downloadBlob(blob, filename);
+            this.showStatus('CSV exported successfully! 📊', 'success');
+
+        } catch (error) {
+            console.error('Error exporting CSV:', error);
+            this.showStatus('Error exporting CSV', 'error');
+        }
+    }
+
+    // Enhanced PDF Export with full A4 pages and charts
+    async exportPDF() {
+        try {
+            if (!this.pdfLoaded) {
+                this.showStatus('Loading PDF library...', 'info');
+                await this.loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js');
+                this.pdfLoaded = true;
+            }
+
+            if (typeof html2pdf === 'undefined') {
+                throw new Error('PDF library not loaded');
+            }
+
+            this.showStatus('Generating PDF report...', 'info');
+
+            // Create temporary PDF content
+            const pdfContent = await this.createPDFContent();
+
+            // Configure PDF options for A4
+            const options = {
+                margin: [10, 10, 10, 10],
+                filename: `diet_tracker_report_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            // Generate PDF
+            const pdfBlob = await html2pdf().set(options).from(pdfContent).outputPdf('blob');
+
+            // Download or open in new tab
+            const filename = options.filename;
+            this.downloadBlob(pdfBlob, filename);
+
+            this.showStatus('PDF exported successfully! 📄', 'success');
+
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+            this.showStatus('Error generating PDF. Please try again.', 'error');
+        }
+    }
+
+    // Create comprehensive PDF content
+    async createPDFContent() {
+        const today = new Date();
+        const dateRange = this.getDateRange();
+        const summary = this.calculateTotalSummary();
+
+        // Create temporary container
+        const container = document.createElement('div');
+        container.style.cssText = `
+            width: 210mm;
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.4;
+            padding: 20px;
+            background: white;
+        `;
+
+        container.innerHTML = `
+            <style>
+                @media print {
+                    body { margin: 0; }
+                    .page-break { page-break-before: always; }
+                    .no-break { page-break-inside: avoid; }
+                    table { border-collapse: collapse; width: 100%; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f5f5f5; font-weight: bold; }
+                }
+                .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+                .logo { font-size: 24px; font-weight: bold; color: #1FB8CD; margin-bottom: 10px; }
+                .subtitle { color: #666; margin-bottom: 5px; }
+                .date { color: #888; font-size: 14px; }
+                .summary { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+                .summary h3 { margin-top: 0; color: #1FB8CD; }
+                .nutrition-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0; }
+                .nutrition-item { text-align: center; padding: 10px; background: white; border-radius: 6px; border: 1px solid #ddd; }
+                .nutrition-value { font-size: 20px; font-weight: bold; color: #059669; margin-bottom: 5px; }
+                .nutrition-label { font-size: 12px; color: #666; text-transform: uppercase; }
+                .section-title { color: #1FB8CD; font-size: 18px; font-weight: bold; margin: 30px 0 15px 0; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12px; }
+                th, td { padding: 8px; text-align: left; border: 1px solid #ddd; }
+                th { background-color: #f5f5f5; font-weight: bold; }
+                .meal-badge { background: #3b82f6; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+                .footer { text-align: center; margin-top: 40px; color: #666; font-size: 12px; border-top: 1px solid #ddd; padding-top: 20px; }
+            </style>
+
+            <div class="header">
+                <div class="logo">Diet Tracker Report</div>
+                <div class="subtitle">TheDietPlanner.com</div>
+                <div class="date">Generated on ${today.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                })}</div>
+            </div>
+
+            <div class="summary no-break">
+                <h3>📊 Nutrition Summary (${dateRange})</h3>
+                <div class="nutrition-grid">
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${Math.round(safeNumber(summary.calories))}</div>
+                        <div class="nutrition-label">Total Calories</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${Math.round(safeNumber(summary.protein))}g</div>
+                        <div class="nutrition-label">Total Protein</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${Math.round(safeNumber(summary.carbs))}g</div>
+                        <div class="nutrition-label">Total Carbs</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${Math.round(safeNumber(summary.fat))}g</div>
+                        <div class="nutrition-label">Total Fat</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${Math.round(safeNumber(summary.fiber))}g</div>
+                        <div class="nutrition-label">Total Fiber</div>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-value">${Math.round(safeNumber(summary.water))}ml</div>
+                        <div class="nutrition-label">Total Water</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">🍽️ Food Entries</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Meal</th>
+                        <th>Food</th>
+                        <th>Serving</th>
+                        <th>Calories</th>
+                        <th>Protein</th>
+                        <th>Carbs</th>
+                        <th>Fat</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${this.entries.map(entry => `
+                        <tr class="no-break">
+                            <td>${entry.date}</td>
+                            <td><span class="meal-badge">${entry.mealTime}</span></td>
+                            <td>${entry.foodName}</td>
+                            <td>${entry.servingSize}</td>
+                            <td>${Math.round(safeNumber(entry.calories))}</td>
+                            <td>${Math.round(safeNumber(entry.protein))}g</td>
+                            <td>${Math.round(safeNumber(entry.carbs))}g</td>
+                            <td>${Math.round(safeNumber(entry.fat))}g</td>
+                            <td>${entry.notes || ''}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+
+            <div class="footer">
+                <p><strong>Diet Tracker Report</strong> - Generated by TheDietPlanner.com</p>
+                <p>This nutrition analysis helps track dietary habits and progress towards health goals.</p>
+                <p>For personalized advice, consult with a qualified dietitian or nutritionist.</p>
+            </div>
+        `;
+
+        return container;
+    }
+
+    getDateRange() {
+        if (this.entries.length === 0) return 'No entries';
+
+        const dates = this.entries.map(e => e.date).sort();
+        const firstDate = new Date(dates[0]);
+        const lastDate = new Date(dates[dates.length - 1]);
+
+        if (dates.length === 1) {
+            return firstDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        return `${firstDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${lastDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    }
+
+    calculateTotalSummary() {
+        return this.entries.reduce((summary, entry) => {
+            summary.calories += safeNumber(entry.calories);
+            summary.protein += safeNumber(entry.protein);
+            summary.carbs += safeNumber(entry.carbs);
+            summary.fat += safeNumber(entry.fat);
+            summary.fiber += safeNumber(entry.fiber);
+            summary.water += safeNumber(entry.waterIntake);
+            return summary;
+        }, {
+            calories: 0,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            fiber: 0,
+            water: 0
         });
     }
 
-    showBackupOptions() {
-        alert(`🔄 Backup & Restore Options:
+    // Enhanced download with iframe compatibility
+    downloadBlob(blob, filename) {
+        try {
+            // Create object URL
+            const url = URL.createObjectURL(blob);
 
-💾 Backup JSON: Complete backup of all data
-📊 Export CSV: Spreadsheet format
-📋 Template: Google Sheets template
+            // Try direct download first
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
 
-All data is stored locally for privacy!`);
-    }
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
 
-    showStatus(message, type = 'success') {
-        console.log(`${type.toUpperCase()}: ${message}`);
-        
-        const statusEl = document.getElementById('exportStatus');
-        if (statusEl) {
-            statusEl.textContent = message;
-            statusEl.className = `export-status ${type}`;
-            statusEl.style.display = 'block';
-            
-            setTimeout(() => {
-                statusEl.style.display = 'none';
-            }, 5000);
+            // Clean up
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        } catch (error) {
+            console.error('Direct download failed, opening in new tab:', error);
+
+            // Fallback: open in new tab
+            try {
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            } catch (fallbackError) {
+                console.error('Fallback also failed:', fallbackError);
+                this.showStatus('Download failed. Please try again or check browser settings.', 'error');
+            }
         }
     }
 
@@ -1430,104 +1553,130 @@ All data is stored locally for privacy!`);
             const data = {
                 entries: this.entries,
                 profile: this.profile,
+                customFoods: this.customFoods,
+                version: '1.1.0',
                 lastSaved: new Date().toISOString()
             };
-            
-            localStorage.setItem('dietTrackerData', JSON.stringify(data));
-            console.log(`Data saved: ${this.entries.length} entries`);
+            localStorage.setItem('diet_tracker_v1', JSON.stringify(data));
         } catch (error) {
-            console.error('Save error:', error);
-            this.showStatus('Error saving data', 'error');
+            console.error('Error saving data:', error);
         }
     }
 
     async loadData() {
         try {
-            const savedData = localStorage.getItem('dietTrackerData');
-            
-            if (savedData) {
-                const data = JSON.parse(savedData);
+            const saved = localStorage.getItem('diet_tracker_v1');
+            if (saved) {
+                const data = JSON.parse(saved);
                 this.entries = data.entries || [];
-                this.profile = { ...this.profile, ...(data.profile || {}) };
-                console.log(`Data loaded: ${this.entries.length} entries`);
-            } else {
-                this.loadSampleData();
-                console.log('Sample data loaded');
+                this.profile = data.profile || this.profile;
+                this.customFoods = data.customFoods || [];
+                console.log('✅ Data loaded from localStorage');
             }
         } catch (error) {
-            console.error('Load error:', error);
-            this.loadSampleData();
+            console.error('Error loading data:', error);
         }
     }
 
-    loadSampleData() {
-        const today = this.currentDate;
-        
-        this.entries = [
-            {
-                id: this.generateId(),
-                date: today,
-                mealTime: 'breakfast',
-                foodName: 'Roti (1 medium)',
-                servingSize: '2 pieces',
-                calories: 238,
-                protein: 6,
-                carbs: 36,
-                fat: 4,
-                fiber: 4,
-                waterIntake: 0,
-                notes: 'With ghee',
-                timestamp: new Date().toISOString()
-            },
-            {
-                id: this.generateId(),
-                date: today,
-                mealTime: 'breakfast',
-                foodName: 'Dal (1 cup)',
-                servingSize: '1 cup',
-                calories: 200,
-                protein: 15,
-                carbs: 25,
-                fat: 1,
-                fiber: 7,
-                waterIntake: 0,
-                notes: '',
-                timestamp: new Date().toISOString()
-            },
-            {
-                id: this.generateId(),
-                date: today,
-                mealTime: 'snack',
-                foodName: 'Banana (1 medium)',
-                servingSize: '1 piece',
-                calories: 80,
-                protein: 1,
-                carbs: 20,
-                fat: 0,
-                fiber: 2,
-                waterIntake: 200,
-                notes: 'Mid-morning snack',
-                timestamp: new Date().toISOString()
+    // Theme management
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-color-scheme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+        document.documentElement.setAttribute('data-color-scheme', newTheme);
+        localStorage.setItem('diet_tracker_theme', newTheme);
+
+        const icon = document.getElementById('themeIcon');
+        if (icon) {
+            icon.innerHTML = newTheme === 'dark' 
+                ? '<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313-12.454z"/>'
+                : '<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>';
+        }
+
+        this.showStatus(`Switched to ${newTheme} mode 🎨`, 'success');
+    }
+
+    loadThemePreference() {
+        const savedTheme = localStorage.getItem('diet_tracker_theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-color-scheme', savedTheme);
+        }
+    }
+
+    // Utility functions
+    generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    showStatus(message, type = 'info') {
+        // Remove existing status
+        const existingStatus = document.querySelector('.status-message');
+        if (existingStatus) {
+            existingStatus.remove();
+        }
+
+        // Create new status message
+        const status = document.createElement('div');
+        status.className = `status-message status--${type}`;
+        status.textContent = message;
+        status.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        `;
+
+        document.body.appendChild(status);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (status.parentNode) {
+                status.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => status.remove(), 300);
             }
-        ];
-        
-        this.saveData();
+        }, 3000);
+    }
+
+    // Script loader for lazy loading
+    loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
     }
 }
 
-// Initialize the app
-console.log('🚀 Diet Tracker script loaded');
-const dietTracker = new DietTracker();
-window.dietTracker = dietTracker;
+// Initialize the app when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.dietTracker = new DietTracker();
+    });
+} else {
+    window.dietTracker = new DietTracker();
+}
 
-// Handle deep linking
-window.addEventListener('load', () => {
-    const hash = window.location.hash.substring(1);
-    if (hash && ['daily', 'weekly', 'analytics', 'export'].includes(hash)) {
-        setTimeout(() => {
-            dietTracker.switchTab(hash);
-        }, 1000);
+// Add CSS for status animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
     }
-});
-
-console.log('✅ Diet Tracker ready');
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
+`;
+document.head.appendChild(style);
