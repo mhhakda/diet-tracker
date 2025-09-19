@@ -1,11 +1,21 @@
 /**
- * Diet Tracker Application - Production Ready with Enhanced Diet Planner Integration
- * A comprehensive nutrition tracking app with Indian foods database
- * Features: Entry management, export functionality, charts, offline storage, one-time meal plan import
+ * DEBUGGING VERSION - Diet Tracker Enhanced Integration
+ * This version includes extensive logging to identify why import notifications show but no data is imported
  * 
- * @version 1.3.0 - FIXED DUPLICATE IMPORT ISSUE
+ * @version 1.3.1 - DEBUG ENHANCED
  * @author TheDietPlanner.com
  */
+
+// ENHANCED Diet Planner Integration with DEBUGGING
+// Addresses the issue where notification shows but no data is actually imported
+
+// Integration keys to check for incoming data
+const INTEGRATION_KEYS = [
+    'dietplanner_integration_v3',
+    'planned_meals_v1', 
+    'diettracker_import',
+    'meal_plan_transfer'
+];
 
 // Global helper function for safe numeric parsing
 function safeNumber(v) {
@@ -15,53 +25,47 @@ function safeNumber(v) {
     return isNaN(n) ? 0 : n;
 }
 
-// ENHANCED Diet Planner Integration - One-time Import System
-// Integration keys to check for incoming data
-const INTEGRATION_KEYS = [
-    'dietplanner_integration_v3',
-    'planned_meals_v1', 
-    'diettracker_import',
-    'meal_plan_transfer'
-];
-
-// Session tracking for imported data
-let importSessionId = null;
-let importedDataHash = null;
-
-// Check for incoming meal plan data on page load  
-document.addEventListener('DOMContentLoaded', function() {
-    // Small delay to ensure Diet Tracker is initialized first
-    setTimeout(() => {
-        checkForIncomingMealPlan();
-    }, 1000);
-});
-
-// Enhanced function to check and load incoming meal plan data (ONE TIME ONLY)
+// Enhanced function to check and load incoming meal plan data (with extensive debugging)
 function checkForIncomingMealPlan() {
+    console.log('🔍 Starting checkForIncomingMealPlan...');
     let integrationData = null;
     let usedKey = null;
     
     // Check all possible integration keys
     for (const key of INTEGRATION_KEYS) {
         try {
+            console.log(`🔍 Checking integration key: ${key}`);
             const stored = localStorage.getItem(key);
             if (stored) {
+                console.log(`✅ Found data in localStorage for key: ${key}`);
                 const data = JSON.parse(stored);
+                console.log('📄 Parsed data:', data);
+                
                 if (data && data.mealPlan && data.userProfile) {
+                    console.log('✅ Valid integration data found!');
                     integrationData = data;
                     usedKey = key;
                     break;
+                } else {
+                    console.log('❌ Data structure invalid - missing mealPlan or userProfile');
                 }
+            } else {
+                console.log(`❌ No data found for key: ${key}`);
             }
         } catch (error) {
-            console.log(`Error parsing ${key}:`, error);
+            console.log(`❌ Error parsing ${key}:`, error);
         }
     }
     
     // If data found, check if it's already been imported
     if (integrationData) {
+        console.log('🎯 Processing integration data...');
+        console.log('📊 Meal plan data:', integrationData.mealPlan);
+        console.log('👤 User profile:', integrationData.userProfile);
+        
         // Create a hash of the data to check if it's the same as previously imported
         const dataHash = createDataHash(integrationData);
+        console.log('🔐 Data hash created:', dataHash);
         
         // Check session storage for import status
         const importStatus = sessionStorage.getItem('dietplanner_import_status');
@@ -69,18 +73,21 @@ function checkForIncomingMealPlan() {
         if (importStatus) {
             try {
                 const status = JSON.parse(importStatus);
+                console.log('📋 Previous import status:', status);
                 if (status.dataHash === dataHash && status.imported === true) {
                     console.log('✅ Data already imported in this session, skipping...');
                     return; // Exit early - data already imported
                 }
             } catch (error) {
-                // If error parsing status, remove it and continue
+                console.log('❌ Error parsing import status, removing:', error);
                 sessionStorage.removeItem('dietplanner_import_status');
             }
         }
         
-        console.log('✅ Found new meal plan data from Diet Planner');
+        console.log('🚀 Found new meal plan data from Diet Planner');
         processMealPlanData(integrationData, usedKey, dataHash);
+    } else {
+        console.log('❌ No integration data found in any localStorage keys');
     }
 }
 
@@ -99,8 +106,11 @@ function createDataHash(data) {
     }
 }
 
-// Enhanced function to process meal plan data with session tracking
+// Enhanced function to process meal plan data with extensive debugging
 function processMealPlanData(data, usedKey, dataHash) {
+    console.log('🔄 Starting processMealPlanData...');
+    console.log('📤 Input data:', data);
+    
     try {
         // Show import message
         showImportMessage('🔄 Importing your meal plan from Diet Planner...', 'info');
@@ -112,23 +122,38 @@ function processMealPlanData(data, usedKey, dataHash) {
             timestamp: new Date().toISOString()
         }));
         
-        // Wait for dietTracker instance to be available
+        // Extended wait for dietTracker instance to be available
+        let attempts = 0;
+        const maxAttempts = 100; // 10 seconds total (100 * 100ms)
+        
         const waitForDietTracker = setInterval(() => {
+            attempts++;
+            console.log(`⏳ Waiting for dietTracker (attempt ${attempts}/${maxAttempts})`);
+            console.log('🔍 window.dietTracker exists:', !!window.dietTracker);
+            
             if (window.dietTracker) {
+                console.log('✅ dietTracker instance found!');
+                console.log('📊 dietTracker entries before import:', window.dietTracker.entries.length);
+                
                 clearInterval(waitForDietTracker);
                 
                 // Set daily nutrition targets
                 if (data.dailyTargets) {
+                    console.log('🎯 Updating nutrition targets...');
                     updateNutritionTargets(data.dailyTargets);
                 }
                 
                 // Import meal plan
                 if (data.mealPlan) {
-                    importWeeklyMealPlan(data.mealPlan);
+                    console.log('📋 Starting meal plan import...');
+                    const importResult = importWeeklyMealPlan(data.mealPlan);
+                    console.log('📊 Import result:', importResult);
+                    console.log('📊 dietTracker entries after import:', window.dietTracker.entries.length);
                 }
                 
                 // Clean up the integration data after successful import
                 localStorage.removeItem(usedKey);
+                console.log('🧹 Cleaned up localStorage key:', usedKey);
                 
                 // Mark as successfully imported in session
                 sessionStorage.setItem('dietplanner_import_status', JSON.stringify({
@@ -140,23 +165,26 @@ function processMealPlanData(data, usedKey, dataHash) {
                 // Show success message
                 setTimeout(() => {
                     showImportMessage('✅ Meal plan imported successfully from Diet Planner!', 'success');
-                    // Hide message after 4 seconds
                     setTimeout(() => {
                         hideImportMessage();
                     }, 4000);
                 }, 1000);
                 
                 console.log('✅ Meal plan imported successfully from Diet Planner');
+                
+            } else if (attempts >= maxAttempts) {
+                console.log('❌ Timeout waiting for dietTracker instance');
+                clearInterval(waitForDietTracker);
+                showImportMessage('❌ Error: Diet Tracker not ready. Please refresh the page.', 'error');
+                sessionStorage.removeItem('dietplanner_import_status');
+                setTimeout(() => {
+                    hideImportMessage();
+                }, 5000);
             }
         }, 100);
         
-        // Timeout after 5 seconds if dietTracker not found
-        setTimeout(() => {
-            clearInterval(waitForDietTracker);
-        }, 5000);
-        
     } catch (error) {
-        console.error('Error importing meal plan:', error);
+        console.error('❌ Error in processMealPlanData:', error);
         showImportMessage('❌ Error importing meal plan. Please try again.', 'error');
         
         // Reset import status on error
@@ -171,6 +199,8 @@ function processMealPlanData(data, usedKey, dataHash) {
 // Function to update nutrition targets in your Diet Tracker
 function updateNutritionTargets(targets) {
     try {
+        console.log('🎯 Updating nutrition targets:', targets);
+        
         // Update the dietTracker profile
         if (window.dietTracker) {
             window.dietTracker.profile = {
@@ -183,49 +213,103 @@ function updateNutritionTargets(targets) {
             };
             
             // Save the updated profile
-            window.dietTracker.saveData();
-            window.dietTracker.loadProfile();
+            if (typeof window.dietTracker.saveData === 'function') {
+                window.dietTracker.saveData();
+            }
+            if (typeof window.dietTracker.loadProfile === 'function') {
+                window.dietTracker.loadProfile();
+            }
             console.log('✅ Nutrition targets updated:', window.dietTracker.profile);
         }
     } catch (error) {
-        console.error('Error updating nutrition targets:', error);
+        console.error('❌ Error updating nutrition targets:', error);
     }
 }
 
-// Function to import the weekly meal plan
+// Enhanced meal plan import with detailed logging
 function importWeeklyMealPlan(mealPlan) {
-    if (!window.dietTracker) return;
+    console.log('📋 Starting importWeeklyMealPlan...');
+    console.log('📊 Meal plan structure:', mealPlan);
+    
+    if (!window.dietTracker) {
+        console.log('❌ window.dietTracker not available');
+        return { success: false, imported: 0, error: 'dietTracker not available' };
+    }
     
     const days = Object.keys(mealPlan);
     const mealTypes = ['breakfast', 'lunch', 'dinner', 'snacks'];
     let importedCount = 0;
+    let errors = [];
+    
+    console.log(`📅 Processing ${days.length} days:`, days);
+    console.log(`🍽️ Processing meal types:`, mealTypes);
     
     days.forEach(day => {
+        console.log(`📅 Processing day: ${day}`);
         mealTypes.forEach(mealType => {
             const meal = mealPlan[day][mealType];
             if (meal) {
+                console.log(`🍽️ Processing ${mealType} for ${day}:`, meal);
+                
                 // Add meal entry to your Diet Tracker
                 const success = addMealEntryToTracker(day, mealType, meal);
-                if (success) importedCount++;
+                if (success) {
+                    importedCount++;
+                    console.log(`✅ Successfully added ${meal.title || 'meal'} for ${day} ${mealType}`);
+                } else {
+                    errors.push(`Failed to add ${meal.title || 'meal'} for ${day} ${mealType}`);
+                    console.log(`❌ Failed to add ${meal.title || 'meal'} for ${day} ${mealType}`);
+                }
+            } else {
+                console.log(`⚠️ No meal data for ${day} ${mealType}`);
             }
         });
     });
     
-    // Refresh the views if entries were added
+    // Force refresh the views if entries were added
     if (importedCount > 0) {
-        window.dietTracker.renderDailyView();
-        window.dietTracker.renderWeeklyView();
-        console.log(`✅ Imported ${importedCount} meal entries`);
+        console.log(`🔄 Refreshing views after importing ${importedCount} entries`);
+        try {
+            if (typeof window.dietTracker.renderDailyView === 'function') {
+                window.dietTracker.renderDailyView();
+            } else {
+                console.log('⚠️ renderDailyView method not available');
+            }
+            if (typeof window.dietTracker.renderWeeklyView === 'function') {
+                window.dietTracker.renderWeeklyView();
+            } else {
+                console.log('⚠️ renderWeeklyView method not available');
+            }
+        } catch (error) {
+            console.log('❌ Error refreshing views:', error);
+        }
+        console.log(`✅ Import completed: ${importedCount} entries imported`);
+    } else {
+        console.log('❌ No entries were imported');
     }
+    
+    if (errors.length > 0) {
+        console.log('❌ Import errors:', errors);
+    }
+    
+    return { success: importedCount > 0, imported: importedCount, errors };
 }
 
-// Enhanced meal entry addition with duplicate detection
+// Enhanced meal entry addition with better debugging
 function addMealEntryToTracker(day, mealType, meal) {
-    if (!window.dietTracker) return false;
+    console.log(`➕ Adding meal entry: ${day} ${mealType}`, meal);
+    
+    if (!window.dietTracker) {
+        console.log('❌ window.dietTracker not available');
+        return false;
+    }
     
     try {
         const targetDate = convertDayToDate(day);
         const adjustedMealType = mealType === 'snacks' ? 'snack' : mealType;
+        
+        console.log(`📅 Target date: ${targetDate}`);
+        console.log(`🍽️ Adjusted meal type: ${adjustedMealType}`);
         
         // Check for duplicate entries before adding
         const existingEntry = window.dietTracker.entries.find(entry => 
@@ -236,7 +320,7 @@ function addMealEntryToTracker(day, mealType, meal) {
         );
         
         if (existingEntry) {
-            console.log(`Skipping duplicate entry: ${meal.title} for ${day} ${mealType}`);
+            console.log(`⚠️ Skipping duplicate entry: ${meal.title} for ${day} ${mealType}`);
             return false; // Don't add duplicate
         }
         
@@ -256,13 +340,24 @@ function addMealEntryToTracker(day, mealType, meal) {
             timestamp: new Date().toISOString()
         };
         
+        console.log('📊 Meal data to be added:', mealData);
+        
         // Add to entries array
         window.dietTracker.entries.push(mealData);
-        console.log(`Added meal entry: ${meal.title} for ${day} ${mealType}`);
+        
+        console.log(`✅ Added meal entry successfully: ${meal.title}`);
+        console.log(`📊 Total entries now: ${window.dietTracker.entries.length}`);
+        
+        // Force save data
+        if (typeof window.dietTracker.saveData === 'function') {
+            window.dietTracker.saveData();
+            console.log('💾 Data saved after adding entry');
+        }
+        
         return true;
         
     } catch (error) {
-        console.error('Error adding meal entry:', error);
+        console.error('❌ Error adding meal entry:', error);
         return false;
     }
 }
@@ -352,299 +447,52 @@ function hideImportMessage() {
     }
 }
 
-// Add a manual reset function for testing/debugging
+// Add debugging functions for manual testing
+function debugDietTracker() {
+    console.log('=== DIET TRACKER DEBUG INFO ===');
+    console.log('window.dietTracker exists:', !!window.dietTracker);
+    if (window.dietTracker) {
+        console.log('dietTracker.entries:', window.dietTracker.entries);
+        console.log('dietTracker.entries.length:', window.dietTracker.entries.length);
+        console.log('dietTracker methods available:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.dietTracker)));
+        console.log('dietTracker.profile:', window.dietTracker.profile);
+    }
+    console.log('localStorage keys:', Object.keys(localStorage));
+    console.log('sessionStorage keys:', Object.keys(sessionStorage));
+    console.log('Import status:', sessionStorage.getItem('dietplanner_import_status'));
+    
+    // Check for integration data
+    INTEGRATION_KEYS.forEach(key => {
+        const data = localStorage.getItem(key);
+        if (data) {
+            try {
+                const parsed = JSON.parse(data);
+                console.log(`Integration data for ${key}:`, parsed);
+            } catch (error) {
+                console.log(`Invalid JSON for ${key}:`, data);
+            }
+        }
+    });
+}
+
+// Add reset function for debugging
 function resetImportStatus() {
     sessionStorage.removeItem('dietplanner_import_status');
-    console.log('Import status reset - next import will proceed normally');
+    console.log('✅ Import status reset - next import will proceed normally');
 }
 
-// Optional: Clear old import status on page reload after some time
-window.addEventListener('load', function() {
-    const importStatus = sessionStorage.getItem('dietplanner_import_status');
-    if (importStatus) {
-        try {
-            const status = JSON.parse(importStatus);
-            const importTime = new Date(status.timestamp);
-            const now = new Date();
-            const hoursSinceImport = (now - importTime) / (1000 * 60 * 60);
-            
-            // Clear status if more than 2 hours old
-            if (hoursSinceImport > 2) {
-                sessionStorage.removeItem('dietplanner_import_status');
-                console.log('Cleared old import status');
-            }
-        } catch (error) {
-            // If there's an error parsing, just remove it
-            sessionStorage.removeItem('dietplanner_import_status');
-        }
-    }
+// Add this to global scope for debugging
+window.debugDietTracker = debugDietTracker;
+window.resetImportStatus = resetImportStatus;
+
+// Check for incoming meal plan data on page load  
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM Content Loaded - Setting up import check');
+    // Small delay to ensure Diet Tracker is initialized first
+    setTimeout(() => {
+        console.log('⏰ Running delayed checkForIncomingMealPlan');
+        checkForIncomingMealPlan();
+    }, 1000);
 });
 
-// ===== REST OF THE ORIGINAL DIET TRACKER CODE CONTINUES BELOW =====
-
-class DietTracker {
-    constructor() {
-        // Initialize app data
-        this.entries = [];
-        this.customFoods = [];
-        this.profile = {
-            calories: 2000,
-            protein: 150,
-            carbs: 250,
-            fat: 65,
-            fiber: 25,
-            water: 2000
-        };
-        this.currentDate = new Date().toISOString().split('T')[0];
-        this.currentWeekStart = this.getWeekStart(new Date());
-        this.charts = {};
-        this.currentEditingEntry = null;
-        this.chartsLoaded = false;
-        this.pdfLoaded = false;
-        
-        // Make instance globally available for integration
-        window.dietTracker = this;
-        
-        // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
-        } else {
-            this.init();
-        }
-    }
-
-    // Comprehensive Indian Foods Database (40+ foods with accurate macros)
-    indianFoods = [
-        // Grains & Cereals
-        {"name": "Roti (1 medium)", "calories": 119, "protein": 3, "carbs": 18, "fat": 2, "fiber": 2, "category": "grains", "serving": "1 piece"},
-        {"name": "Rice cooked (1 cup)", "calories": 120, "protein": 2, "carbs": 30, "fat": 0, "fiber": 0, "category": "grains", "serving": "1 cup"},
-        {"name": "Idli (2 pieces)", "calories": 78, "protein": 3, "carbs": 17, "fat": 0, "fiber": 1, "category": "grains", "serving": "2 pieces"},
-        {"name": "Dosa (1 medium)", "calories": 133, "protein": 4, "carbs": 16, "fat": 6, "fiber": 1, "category": "grains", "serving": "1 piece"},
-        {"name": "Upma (1 cup)", "calories": 183, "protein": 5, "carbs": 27, "fat": 6, "fiber": 2, "category": "grains", "serving": "1 cup"},
-        {"name": "Poha (1 cup)", "calories": 180, "protein": 6, "carbs": 35, "fat": 2, "fiber": 2, "category": "grains", "serving": "1 cup"},
-        {"name": "Paratha (1 medium)", "calories": 280, "protein": 6, "carbs": 36, "fat": 12, "fiber": 3, "category": "grains", "serving": "1 piece"},
-        {"name": "Chapati (1 medium)", "calories": 104, "protein": 3, "carbs": 18, "fat": 2, "fiber": 2, "category": "grains", "serving": "1 piece"},
-        
-        // Legumes & Pulses
-        {"name": "Dal (1 cup)", "calories": 200, "protein": 15, "carbs": 25, "fat": 1, "fiber": 7, "category": "legumes", "serving": "1 cup"},
-        {"name": "Rajma (1 cup)", "calories": 245, "protein": 15, "carbs": 45, "fat": 1, "fiber": 11, "category": "legumes", "serving": "1 cup"},
-        {"name": "Chana (1 cup)", "calories": 210, "protein": 12, "carbs": 35, "fat": 3, "fiber": 10, "category": "legumes", "serving": "1 cup"},
-        {"name": "Moong Dal (1 cup)", "calories": 190, "protein": 14, "carbs": 32, "fat": 1, "fiber": 8, "category": "legumes", "serving": "1 cup"},
-        
-        // Dairy Products
-        {"name": "Milk (1 cup)", "calories": 65, "protein": 3, "carbs": 5, "fat": 4, "fiber": 0, "category": "dairy", "serving": "1 cup"},
-        {"name": "Paneer (100g)", "calories": 265, "protein": 18, "carbs": 1, "fat": 20, "fiber": 0, "category": "dairy", "serving": "100g"},
-        {"name": "Curd (1 cup)", "calories": 98, "protein": 11, "carbs": 12, "fat": 0, "fiber": 0, "category": "dairy", "serving": "1 cup"},
-        {"name": "Buttermilk (1 cup)", "calories": 19, "protein": 2, "carbs": 3, "fat": 0, "fiber": 0, "category": "dairy", "serving": "1 cup"},
-        {"name": "Lassi (1 cup)", "calories": 180, "protein": 6, "carbs": 20, "fat": 8, "fiber": 0, "category": "dairy", "serving": "1 cup"},
-        
-        // Continue with rest of foods...
-        {"name": "Banana (1 medium)", "calories": 80, "protein": 1, "carbs": 20, "fat": 0, "fiber": 2, "category": "fruits", "serving": "1 piece"},
-        {"name": "Apple (1 medium)", "calories": 52, "protein": 0, "carbs": 14, "fat": 0, "fiber": 2, "category": "fruits", "serving": "1 piece"},
-        {"name": "Chicken (100g)", "calories": 150, "protein": 25, "carbs": 0, "fat": 5, "fiber": 0, "category": "protein", "serving": "100g"},
-        {"name": "Egg (1 large)", "calories": 70, "protein": 6, "carbs": 0, "fat": 5, "fiber": 0, "category": "protein", "serving": "1 piece"}
-        // Add remaining foods as needed...
-    ];
-
-    // Initialize the application with defensive programming
-    async init() {
-        console.log('🚀 Initializing Diet Tracker...');
-        try {
-            // Load data first
-            await this.loadData();
-            
-            // Auto-fill today's date in form
-            this.autoFillDate();
-            
-            // Setup event listeners with delay
-            setTimeout(() => {
-                this.setupEventListeners();
-                this.populatePresetFoods();
-                this.setCurrentDate();
-                this.loadProfile();
-                this.loadThemePreference();
-                this.renderDailyView();
-                this.renderWeeklyView();
-                this.setupAutoSave();
-                this.showStatus('Diet Tracker loaded successfully! 🎉', 'success');
-                console.log('✅ Diet Tracker initialized successfully');
-            }, 100);
-        } catch (error) {
-            console.error('❌ Error initializing Diet Tracker:', error);
-            this.showStatus('Error loading Diet Tracker. Please refresh the page.', 'error');
-        }
-    }
-
-    // Auto-fill date input
-    autoFillDate() {
-        try {
-            const dateInput = document.getElementById('entryDate') || document.querySelector('input[type="date"]');
-            if (dateInput && !dateInput.value) {
-                dateInput.value = this.currentDate;
-                console.log('✅ Auto-filled date input with today:', this.currentDate);
-            }
-        } catch (error) {
-            console.error('Error auto-filling date:', error);
-        }
-    }
-
-    // Generate unique ID
-    generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
-    }
-
-    // Calculate daily summary
-    calculateDailySummary(entries) {
-        return entries.reduce((summary, entry) => {
-            summary.calories += safeNumber(entry.calories);
-            summary.protein += safeNumber(entry.protein);
-            summary.carbs += safeNumber(entry.carbs);
-            summary.fat += safeNumber(entry.fat);
-            summary.fiber += safeNumber(entry.fiber);
-            summary.water += safeNumber(entry.waterIntake);
-            return summary;
-        }, { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, water: 0 });
-    }
-
-    // Data persistence methods
-    saveData() {
-        try {
-            const data = {
-                entries: this.entries,
-                customFoods: this.customFoods,
-                profile: this.profile,
-                version: "1.3.0",
-                lastSaved: new Date().toISOString()
-            };
-            localStorage.setItem('dietTracker_data', JSON.stringify(data));
-            console.log('✅ Data saved to localStorage');
-        } catch (error) {
-            console.error('❌ Error saving data:', error);
-        }
-    }
-
-    async loadData() {
-        try {
-            const stored = localStorage.getItem('dietTracker_data');
-            if (stored) {
-                const data = JSON.parse(stored);
-                this.entries = data.entries || [];
-                this.customFoods = data.customFoods || [];
-                this.profile = { ...this.profile, ...(data.profile || {}) };
-                console.log('✅ Data loaded from localStorage');
-            }
-        } catch (error) {
-            console.error('❌ Error loading data:', error);
-        }
-    }
-
-    // Status message display
-    showStatus(message, type = 'info') {
-        console.log(`Status: ${message}`);
-        // You can implement visual status display here
-    }
-
-    // Theme management
-    loadThemePreference() {
-        const savedTheme = localStorage.getItem('dietTracker_theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-theme');
-        }
-    }
-
-    toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        const isDark = document.body.classList.contains('dark-theme');
-        localStorage.setItem('dietTracker_theme', isDark ? 'dark' : 'light');
-        this.showStatus(`Theme changed to ${isDark ? 'dark' : 'light'} mode`, 'success');
-    }
-
-    // Setup auto-save functionality
-    setupAutoSave() {
-        setInterval(() => {
-            this.saveData();
-        }, 30000);
-
-        window.addEventListener('beforeunload', () => {
-            this.saveData();
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden') {
-                this.saveData();
-            }
-        });
-    }
-
-    // Simplified event listeners setup
-    setupEventListeners() {
-        // Add basic event listeners for your Diet Tracker functionality
-        console.log('✅ Event listeners setup completed');
-    }
-
-    // Populate preset foods dropdown
-    populatePresetFoods() {
-        const select = document.getElementById('presetFoods');
-        if (!select) return;
-        
-        try {
-            select.innerHTML = '<option value="">Select a food...</option>';
-            this.indianFoods.forEach(food => {
-                const option = document.createElement('option');
-                option.value = JSON.stringify(food);
-                option.textContent = food.name;
-                select.appendChild(option);
-            });
-        } catch (error) {
-            console.error('Error populating preset foods:', error);
-        }
-    }
-
-    // Date management
-    setCurrentDate() {
-        const dateInput = document.getElementById('currentDate');
-        if (dateInput) {
-            dateInput.value = this.currentDate;
-        }
-    }
-
-    getWeekStart(date) {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diff = d.getDate() - day;
-        return new Date(d.setDate(diff)).toISOString().split('T')[0];
-    }
-
-    // Load profile
-    loadProfile() {
-        console.log('Profile loaded');
-    }
-
-    // Render methods (simplified for this fix)
-    renderDailyView() {
-        console.log('Daily view rendered');
-    }
-
-    renderWeeklyView() {
-        console.log('Weekly view rendered');
-    }
-
-    // Utility method to capitalize first letter
-    capitalizeFirst(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-
-    // Load external scripts
-    async loadScript(src) {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    }
-}
-
-// Initialize the Diet Tracker when script loads
-new DietTracker();
+console.log('📋 Diet Planner Integration (DEBUG VERSION) loaded successfully');
